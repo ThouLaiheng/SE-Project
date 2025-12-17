@@ -31,6 +31,7 @@ public class SecurityConfig {
      * Configures HTTP security.
      * Currently permits all requests for development purposes.
      * In production, this should be configured with proper authentication.
+     * Explicitly allows Swagger/OpenAPI documentation endpoints.
      *
      * @param http HttpSecurity configuration object
      * @return SecurityFilterChain
@@ -41,7 +42,14 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // Disable CSRF for API development
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll() // Allow all requests (development mode)
+                // Swagger/OpenAPI endpoints - public access
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/v3/api-docs/**").permitAll()
+                // Actuator endpoints - public access
+                .requestMatchers("/actuator/**").permitAll()
+                // API documentation endpoint - public access
+                .requestMatchers("/api/docs/**").permitAll()
+                // Allow all other requests (development mode)
+                .anyRequest().permitAll()
             );
 
         return http.build();
