@@ -7226,3 +7226,41 @@ This generated password is for development use only. Your security configuration
         r1_0.name=?
 2025-12-17 11:25:09.403 [main] INFO  com.demo.lms.config.DatabaseInitializer - Role initialization completed. Available roles: ADMIN
 2025-12-17 11:25:09.403 [main] INFO  com.demo.lms.config.DatabaseInitializer - Database initialization completed successfully!
+2025-12-17 11:29:32.696 [http-nio-8080-exec-3] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-12-17 11:29:32.696 [http-nio-8080-exec-3] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-12-17 11:29:32.698 [http-nio-8080-exec-3] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2025-12-17 11:29:32.723 [http-nio-8080-exec-3] INFO  com.demo.lms.controller.user.UserController - Fetching all users
+2025-12-17 11:29:32.744 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    /* SELECT
+        DISTINCT u 
+    FROM
+        User u 
+    LEFT JOIN
+        
+    FETCH
+        u.userRoles ur 
+    LEFT JOIN
+        
+    FETCH
+        ur.role */ select
+            distinct u1_0.id,
+            u1_0.created_at,
+            u1_0.email,
+            u1_0.enabled,
+            u1_0.name,
+            u1_0.password,
+            u1_0.updated_at,
+            ur1_0.user_id,
+            ur1_0.id,
+            ur1_0.role_id,
+            r1_0.id,
+            r1_0.name 
+        from
+            users u1_0 
+        left join
+            user_roles ur1_0 
+                on u1_0.id=ur1_0.user_id 
+        left join
+            roles r1_0 
+                on r1_0.id=ur1_0.role_id
+2025-12-17 11:29:32.761 [http-nio-8080-exec-3] INFO  com.demo.lms.controller.user.UserController - Found 3 users
