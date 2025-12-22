@@ -27,4 +27,7 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<UserRole> userRoles;
+
+    public User() {
+    }
 }
