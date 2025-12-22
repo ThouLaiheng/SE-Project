@@ -161,6 +161,12 @@
            <version>0.13.0</version>
            <scope>runtime</scope>
         </dependency>
+    
+      <dependency>
+        <groupId>uk.co.vurt.hakken</groupId>
+        <artifactId>hakken-security</artifactId>
+        <version>1.0.0</version>
+      </dependency>
     </dependencies>
 
     <!-- ✅ BUILD -->
