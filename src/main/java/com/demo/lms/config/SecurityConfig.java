@@ -1,12 +1,18 @@
    package com.demo.lms.config;
 
+import java.security.SecureRandom;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+import com.demo.lms.Jwt.JwtFilter;
 
 /**
  * Security configuration for the Library Management System.
@@ -15,6 +21,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    private final JwtFilter jwtFilter;
+
+    public SecurityConfig(JwtFilter jwtFilter) {
+        this.jwtFilter = jwtFilter;
+    }
 
     /**
      * Provides a BCrypt password encoder bean.
@@ -24,7 +35,13 @@ public class SecurityConfig {
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        SecureRandom secureRandom;
+        try{
+            secureRandom = SecureRandom.getInstanceStrong();
+        } catch (Exception e) {
+            secureRandom = new SecureRandom();
+        }
+        return new BCryptPasswordEncoder(12, secureRandom);
     }
 
     /**
@@ -43,16 +60,21 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // Disable CSRF for API development
             .authorizeHttpRequests(auth -> auth
                 // Swagger/OpenAPI endpoints - public access
-                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/v3/api-docs/**", "/api/login", "/login", "/register","/api/register").permitAll()
                 // Actuator endpoints - public access
                 .requestMatchers("/actuator/**").permitAll()
                 // API documentation endpoint - public access
                 .requestMatchers("/api/docs/**").permitAll()
                 // Allow all other requests (development mode)
-                .anyRequest().permitAll()
-            );
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 }
 
