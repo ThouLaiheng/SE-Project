@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Library Management System</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>📚 LMS Dashboard</h1>
+            </div>
+            <div class="nav-user">
+                <span id="userEmail"></span>
+                <button id="logoutBtn" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="welcome-section">
+            <h2>Welcome to Library Management System</h2>
+            <p>You have successfully logged in!</p>
+        </div>
+
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon">📚</div>
+                <h3>Books</h3>
+                <p>Manage library books</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">👥</div>
+                <h3>Users</h3>
+                <p>Manage system users</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">📊</div>
+                <h3>Reports</h3>
+                <p>View statistics</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">⚙️</div>
+                <h3>Settings</h3>
+                <p>Configure system</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
