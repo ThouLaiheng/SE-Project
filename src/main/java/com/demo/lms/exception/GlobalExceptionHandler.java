@@ -22,6 +22,13 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", ex.getMessage()));
     }
 
+    @ExceptionHandler(ContactNotFoundException.class)
+    public ResponseEntity<?> handleContactNotFound(ContactNotFoundException ex) {
+        log.error("Contact not found: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", ex.getMessage()));
+    }
+
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<?> handleExists(UserAlreadyExistsException ex) {
         log.error("User already exists: {}", ex.getMessage());

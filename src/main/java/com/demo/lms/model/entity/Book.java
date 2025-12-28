@@ -23,8 +23,4 @@ public class Book extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private BookCategory category;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    public User user;
 }

@@ -31,4 +31,8 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private ReservationStatus status;
+
+    @Column(name = "expiry_date")
+    private LocalDateTime expiryDate;
+
 }
