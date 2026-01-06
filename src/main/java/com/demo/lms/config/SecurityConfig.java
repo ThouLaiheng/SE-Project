@@ -64,7 +64,7 @@ public class SecurityConfig {
                 // Static resources & root - public access
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 .requestMatchers("/", "/index.html", "/favicon.ico", "/static/**", "/css/**", "/js/**", "/images/**", "/dashboard.html").permitAll()
-                .requestMatchers(HttpMethod.GET, "/**/*.html", "/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.ico").permitAll()
+                .requestMatchers(HttpMethod.GET, "*.html", "*.css", "*.js", "*.png", "*.jpg", "*.ico").permitAll()
                 // Swagger/OpenAPI endpoints - public access
                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/v3/api-docs/**", "/api/login", "/login", "/register","/api/register").permitAll()
                 // Actuator endpoints - public access
