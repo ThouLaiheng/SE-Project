@@ -1,4 +1,4 @@
-package com.demo.lms.dto.result;
+package com.demo.lms.dto.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
