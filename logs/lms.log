@@ -28771,3 +28771,148 @@ org.springframework.web.util.pattern.PatternParseException: No more pattern data
 2026-01-06 10:13:14.583 [http-nio-8080-exec-2] INFO  com.demo.lms.controller.user.UserViewController - Displaying create user form
 2026-01-06 10:14:07.173 [http-nio-8080-exec-5] INFO  com.demo.lms.controller.user.UserViewController - Displaying create user form
 2026-01-06 10:17:49.082 [http-nio-8080-exec-9] INFO  com.demo.lms.controller.user.UserViewController - Displaying create user form
+2026-01-06 10:55:40.230 [LMS-HikariPool:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - LMS-HikariPool - Thread starvation or clock leap detected (housekeeper delta=28m22s335ms576µs400ns).
+2026-01-06 11:00:40.585 [LMS-HikariPool:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - LMS-HikariPool - Thread starvation or clock leap detected (housekeeper delta=2m255ms77µs600ns).
+2026-01-06 11:07:10.015 [main] INFO  com.demo.lms.LmsApplication - Starting LmsApplication using Java 21.0.9 with PID 26780 (C:\Users\User\Documents\New folder\Software Engineer\Project-SE\SE-Project\target\classes started by User in C:\Users\User\Documents\New folder\Software Engineer\Project-SE\SE-Project)
+2026-01-06 11:07:10.026 [main] INFO  com.demo.lms.LmsApplication - No active profile set, falling back to 1 default profile: "default"
+2026-01-06 11:07:16.206 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-01-06 11:07:16.642 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 359 ms. Found 5 JPA repository interfaces.
+2026-01-06 11:07:19.673 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-06 11:07:19.743 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-06 11:07:19.745 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.41]
+2026-01-06 11:07:20.197 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-06 11:07:20.200 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 9967 ms
+2026-01-06 11:07:21.026 [main] DEBUG o.s.b.web.servlet.ServletContextInitializerBeans - Mapping filters: webMvcObservationFilter urls=[/*] order=-2147483647, springSecurityFilterChain urls=[/*] order=-100, resourceUrlEncodingFilter urls=[/*] order=2147483647, characterEncodingFilter urls=[/*] order=-2147483648, formContentFilter urls=[/*] order=-9900, requestContextFilter urls=[/*] order=-105, jwtFilter urls=[/*] order=2147483647
+2026-01-06 11:07:21.029 [main] DEBUG o.s.b.web.servlet.ServletContextInitializerBeans - Mapping servlets: dispatcherServlet urls=[/]
+2026-01-06 11:07:22.177 [main] INFO  com.zaxxer.hikari.HikariDataSource - LMS-HikariPool - Starting...
+2026-01-06 11:07:23.145 [main] INFO  com.zaxxer.hikari.pool.HikariPool - LMS-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@99c3cee
+2026-01-06 11:07:23.152 [main] INFO  com.zaxxer.hikari.HikariDataSource - LMS-HikariPool - Start completed.
+2026-01-06 11:07:23.374 [main] INFO  org.flywaydb.core.FlywayExecutor - Database: jdbc:mysql://localhost:3306/lms_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true (MySQL 8.0)
+2026-01-06 11:07:23.716 [main] INFO  org.flywaydb.core.internal.command.DbValidate - Successfully validated 2 migrations (execution time 00:00.162s)
+2026-01-06 11:07:23.779 [main] INFO  org.flywaydb.core.internal.command.DbMigrate - Current version of schema `lms_db`: 2
+2026-01-06 11:07:23.793 [main] INFO  org.flywaydb.core.internal.command.DbMigrate - Schema `lms_db` is up to date. No migration necessary.
+2026-01-06 11:07:24.244 [main] INFO  org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-01-06 11:07:24.622 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.15.Final
+2026-01-06 11:07:24.786 [main] INFO  o.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-01-06 11:07:25.868 [main] INFO  o.s.o.j.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-01-06 11:07:26.039 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-01-06 11:07:26.072 [main] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (LMS-HikariPool)']
+	Database driver: undefined/unknown
+	Database version: 8.0.41
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-01-06 11:07:29.597 [main] INFO  o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-01-06 11:07:29.779 [main] DEBUG org.hibernate.SQL - 
+    alter table notifications 
+       modify column type enum ('DUE_REMINDER','OVERDUE_ALERT','RESERVATION_READY','SYSTEM')
+2026-01-06 11:07:30.222 [main] INFO  o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-01-06 11:07:31.577 [main] INFO  o.s.data.jpa.repository.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-01-06 11:07:34.750 [main] INFO  o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2026-01-06 11:07:36.205 [main] INFO  o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoints beneath base path '/actuator'
+2026-01-06 11:07:36.695 [main] WARN  o.s.s.c.a.w.c.AuthorizeHttpRequestsConfigurer$AuthorizationManagerRequestMatcherRegistry - One of the patterns in [*.html, *.css, *.js, *.png, *.jpg, *.ico] is missing a leading slash. This is discouraged; please include the leading slash in all your request matcher patterns. In future versions of Spring Security, leaving out the leading slash will result in an exception.
+2026-01-06 11:07:38.524 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-01-06 11:07:38.617 [main] INFO  com.demo.lms.LmsApplication - Started LmsApplication in 31.18 seconds (process running for 34.172)
+2026-01-06 11:07:38.671 [main] INFO  com.demo.lms.config.DatabaseInitializer - Starting database initialization...
+2026-01-06 11:07:38.673 [main] INFO  com.demo.lms.config.DatabaseInitializer - Checking and initializing default roles...
+2026-01-06 11:07:38.930 [http-nio-8080-exec-2] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-06 11:07:38.932 [http-nio-8080-exec-2] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-06 11:07:38.937 [http-nio-8080-exec-2] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 4 ms
+2026-01-06 11:07:39.166 [main] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        r1_0.id,
+        r1_0.name 
+    from
+        roles r1_0 
+    where
+        r1_0.name=?
+2026-01-06 11:07:39.272 [http-nio-8080-exec-2] INFO  c.d.lms.controller.product.ProductViewController - Displaying create product form
+2026-01-06 11:07:39.333 [main] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        r1_0.id,
+        r1_0.name 
+    from
+        roles r1_0 
+    where
+        r1_0.name=?
+2026-01-06 11:07:39.348 [main] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        r1_0.id,
+        r1_0.name 
+    from
+        roles r1_0 
+    where
+        r1_0.name=?
+2026-01-06 11:07:39.351 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        bc1_0.id,
+        bc1_0.description,
+        bc1_0.name 
+    from
+        book_categories bc1_0
+2026-01-06 11:07:39.355 [main] INFO  com.demo.lms.config.DatabaseInitializer - Role initialization completed. Available roles: ADMIN
+2026-01-06 11:07:39.357 [main] INFO  com.demo.lms.config.DatabaseInitializer - Database initialization completed successfully!
+2026-01-06 11:13:58.948 [LMS-HikariPool:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - LMS-HikariPool - Thread starvation or clock leap detected (housekeeper delta=4m5s646ms174µs100ns).
+2026-01-06 11:20:24.235 [http-nio-8080-exec-10] INFO  c.d.lms.controller.product.ProductViewController - Displaying create product form
+2026-01-06 11:20:24.552 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        bc1_0.id,
+        bc1_0.description,
+        bc1_0.name 
+    from
+        book_categories bc1_0
+2026-01-06 11:21:22.532 [http-nio-8080-exec-2] INFO  c.d.lms.controller.product.ProductViewController - Displaying create product form
+2026-01-06 11:21:22.550 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        bc1_0.id,
+        bc1_0.description,
+        bc1_0.name 
+    from
+        book_categories bc1_0
+2026-01-06 11:21:24.035 [http-nio-8080-exec-3] INFO  c.d.lms.controller.product.ProductViewController - Displaying create product form
+2026-01-06 11:21:24.053 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        bc1_0.id,
+        bc1_0.description,
+        bc1_0.name 
+    from
+        book_categories bc1_0
+2026-01-06 11:24:11.892 [http-nio-8080-exec-5] INFO  c.d.lms.controller.product.ProductViewController - Displaying create product form
+2026-01-06 11:24:11.906 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        bc1_0.id,
+        bc1_0.description,
+        bc1_0.name 
+    from
+        book_categories bc1_0
+2026-01-06 11:24:13.402 [http-nio-8080-exec-6] INFO  c.d.lms.controller.product.ProductViewController - Displaying create product form
+2026-01-06 11:24:13.414 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        bc1_0.id,
+        bc1_0.description,
+        bc1_0.name 
+    from
+        book_categories bc1_0
+2026-01-06 11:24:13.911 [http-nio-8080-exec-7] INFO  c.d.lms.controller.product.ProductViewController - Displaying create product form
+2026-01-06 11:24:13.924 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        bc1_0.id,
+        bc1_0.description,
+        bc1_0.name 
+    from
+        book_categories bc1_0
+2026-01-06 11:24:14.225 [http-nio-8080-exec-8] INFO  c.d.lms.controller.product.ProductViewController - Displaying create product form
+2026-01-06 11:24:14.233 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        bc1_0.id,
+        bc1_0.description,
+        bc1_0.name 
+    from
+        book_categories bc1_0
+2026-01-06 11:25:45.646 [SpringApplicationShutdownHook] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-01-06 11:25:45.741 [tomcat-shutdown] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-01-06 11:25:45.871 [SpringApplicationShutdownHook] INFO  o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-01-06 11:25:45.939 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - LMS-HikariPool - Shutdown initiated...
+2026-01-06 11:25:45.967 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - LMS-HikariPool - Shutdown completed.

@@ -71,6 +71,8 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/**").permitAll()
                 // API documentation endpoint - public access
                 .requestMatchers("/api/docs/**").permitAll()
+                // Thymeleaf UI endpoints - public access
+                .requestMatchers("/createProduct").permitAll()
                 // Allow all other requests (development mode)
                 .anyRequest().authenticated()
             )
