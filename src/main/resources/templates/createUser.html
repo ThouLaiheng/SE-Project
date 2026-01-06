@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Management - Library Management System</title>
+    <title>User Management - Library Management System</title>
     <style>
         * {
             margin: 0;
@@ -59,17 +59,17 @@
             background: #0056b3;
         }
 
-        .product-table {
+        .user-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
 
-        .product-table thead {
+        .user-table thead {
             background: #f8f9fa;
         }
 
-        .product-table th {
+        .user-table th {
             padding: 12px;
             text-align: left;
             font-weight: 600;
@@ -77,26 +77,26 @@
             border-bottom: 2px solid #dee2e6;
         }
 
-        .product-table td {
+        .user-table td {
             padding: 12px;
             border-bottom: 1px solid #dee2e6;
             color: #666;
         }
 
-        .product-table tbody tr:hover {
+        .user-table tbody tr:hover {
             background: #f8f9fa;
         }
 
-        .product-image {
+        .user-image {
             width: 50px;
             height: 50px;
-            object-fit: cover;
-            border-radius: 4px;
+            border-radius: 50%;
             background: #e9ecef;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #6c757d;
+            font-size: 20px;
         }
 
         .modal {
@@ -192,12 +192,6 @@
             display: block;
         }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
         .btn-submit {
             width: 100%;
             padding: 10px;
@@ -253,9 +247,30 @@
             font-size: 14px;
         }
 
+        .badge {
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-admin {
+            background: #dc3545;
+            color: white;
+        }
+
+        .badge-user {
+            background: #28a745;
+            color: white;
+        }
+
         @media (max-width: 600px) {
-            .form-row {
-                grid-template-columns: 1fr;
+            .user-table {
+                font-size: 12px;
+            }
+            .user-table th,
+            .user-table td {
+                padding: 8px;
             }
         }
     </style>
@@ -263,13 +278,13 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Product Management</h1>
-            <button class="btn-create" onclick="openModal()">Create Product</button>
+            <h1>User Management</h1>
+            <button class="btn-create" onclick="openModal()">Create User</button>
         </div>
 
         <!-- Success Message -->
         <div th:if="${success}" class="alert alert-success">
-            <span th:text="${success}">Book created successfully!</span>
+            <span th:text="${success}">User created successfully!</span>
         </div>
 
         <!-- Error Message -->
@@ -277,34 +292,37 @@
             <span th:text="${error}">An error occurred!</span>
         </div>
 
-        <!-- Product Table -->
-        <table class="product-table">
+        <!-- User Table -->
+        <table class="user-table">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th>Id</th>
                     <th>Image</th>
                     <th>Name</th>
-                    <th>Description</th>
-                    <th>ISBN</th>
+                    <th>Email</th>
+                    <th>Role</th>
                     <th>Created At</th>
                 </tr>
             </thead>
             <tbody>
-                <tr th:if="${books != null and !books.empty}" th:each="book, iter : ${books}">
+                <tr th:if="${users != null and !users.empty}" th:each="user, iter : ${users}">
                     <td th:text="${iter.count}">1</td>
                     <td>
-                        <div class="product-image">📚</div>
+                        <div class="user-image">👤</div>
                     </td>
-                    <td th:text="${book.title}">Book Title</td>
-                    <td th:text="${book.category != null ? book.category.name : 'No Category'}">Category</td>
-                    <td th:text="${book.isbn}">ISBN</td>
-                    <td th:text="${#temporals.format(book.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01</td>
+                    <td th:text="${user.name}">User Name</td>
+                    <td th:text="${user.email}">user@example.com</td>
+                    <td>
+                        <span th:if="${user.role == 'ADMIN'}" class="badge badge-admin">ADMIN</span>
+                        <span th:if="${user.role != 'ADMIN'}" class="badge badge-user" th:text="${user.role ?: 'USER'}">USER</span>
+                    </td>
+                    <td th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01</td>
                 </tr>
-                <tr th:if="${books == null or books.empty}">
+                <tr th:if="${users == null or users.empty}">
                     <td colspan="6">
                         <div class="empty-state">
-                            <h3>📚 No Products Yet</h3>
-                            <p>Click "Create Product" to add your first book to the inventory</p>
+                            <h3>👥 No Users Yet</h3>
+                            <p>Click "Create User" to add your first user to the system</p>
                         </div>
                     </td>
                 </tr>
@@ -313,21 +331,43 @@
     </div>
 
     <!-- Modal -->
-    <div id="productModal" class="modal">
+    <div id="userModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Create New Product</h2>
+                <h2>Create New User</h2>
                 <span class="close" onclick="closeModal()">&times;</span>
             </div>
 
-            <form id="createProductForm" th:action="@{/createProduct}" method="post">
+            <form id="createUserForm" th:action="@{/createUser}" method="post">
                 <div class="form-group">
-                    <label for="title">Book Title <span class="required">*</span></label>
-              modal = document.getElementById('productModal');
-        const form = document.getElementById('createProductForm');
-        const titleInput = document.getElementById('title');
-        const authorInput = document.getElementById('author');
-        const isbnInput = document.getElementById('isbn');
+                    <label for="name">Full Name <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" placeholder="Enter full name" required>
+                    <span class="error-message" id="nameError">Name is required</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" placeholder="Enter email address" required>
+                    <span class="error-message" id="emailError">Valid email is required</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password <span class="required">*</span></label>
+                    <input type="password" id="password" name="password" placeholder="Enter password" required minlength="6">
+                    <span class="error-message" id="passwordError">Password must be at least 6 characters</span>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">Create User</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('userModal');
+        const form = document.getElementById('createUserForm');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
         const submitBtn = document.getElementById('submitBtn');
 
         function openModal() {
@@ -347,9 +387,9 @@
         }
 
         // Real-time validation
-        titleInput.addEventListener('input', () => validateField(titleInput, 'titleError'));
-        authorInput.addEventListener('input', () => validateField(authorInput, 'authorError'));
-        isbnInput.addEventListener('input', () => validateField(isbnInput, 'isbnError'));
+        nameInput.addEventListener('input', () => validateField(nameInput, 'nameError'));
+        emailInput.addEventListener('input', () => validateField(emailInput, 'emailError'));
+        passwordInput.addEventListener('input', () => validateField(passwordInput, 'passwordError'));
 
         function validateField(input, errorId) {
             const errorElement = document.getElementById(errorId);
@@ -368,9 +408,9 @@
         form.addEventListener('submit', (e) => {
             let isValid = true;
             
-            isValid = validateField(titleInput, 'titleError') && isValid;
-            isValid = validateField(authorInput, 'authorError') && isValid;
-            isValid = validateField(isbnInput, 'isbnError') && isValid;
+            isValid = validateField(nameInput, 'nameError') && isValid;
+            isValid = validateField(emailInput, 'emailError') && isValid;
+            isValid = validateField(passwordInput, 'passwordError') && isValid;
 
             if (!isValid) {
                 e.preventDefault();
@@ -392,41 +432,7 @@
         const hasError = document.querySelector('.alert-error');
         if (hasError) {
             openModal();
-        } const errorElement = document.getElementById(errorId);
-            
-            if (!input.validity.valid) {
-                input.classList.add('error');
-                errorElement.classList.add('show');
-                return false;
-            } else {
-                input.classList.remove('error');
-                errorElement.classList.remove('show');
-                return true;
-            }
         }
-
-        form.addEventListener('submit', (e) => {
-            let isValid = true;
-            
-            isValid = validateField(titleInput, 'titleError') && isValid;
-            isValid = validateField(authorInput, 'authorError') && isValid;
-            isValid = validateField(isbnInput, 'isbnError') && isValid;
-
-            if (!isValid) {
-                e.preventDefault();
-            } else {
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Creating...';
-            }
-        });
-
-        // Auto-hide alerts after 5 seconds
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(alert => {
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 5000);
-        });
     </script>
 </body>
 </html>
