@@ -7124,6 +7124,7 @@ This generated password is for development use only. Your security configuration
         r1_0.id,
         r1_0.name 
     from
+<<<<<<< Updated upstream
         roles r1_0 
     where
         r1_0.name=?
@@ -7167,10 +7168,46 @@ This generated password is for development use only. Your security configuration
 	Database JDBC URL [Connecting through datasource 'HikariDataSource (LMS-HikariPool)']
 	Database driver: undefined/unknown
 	Database version: 8.0.43
+=======
+        users u1_0
+2026-01-06 12:35:28.824 [SpringApplicationShutdownHook] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-01-06 12:35:28.846 [tomcat-shutdown] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-01-06 12:35:28.880 [SpringApplicationShutdownHook] INFO  o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-01-06 12:35:28.893 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - LMS-HikariPool - Shutdown initiated...
+2026-01-06 12:35:28.899 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - LMS-HikariPool - Shutdown completed.
+2026-01-06 13:30:01.035 [main] INFO  com.demo.lms.LmsApplication - Starting LmsApplication using Java 21.0.9 with PID 18964 (C:\Users\User\Documents\New folder\Software Engineer\Project-SE\SE-Project\target\classes started by User in C:\Users\User\Documents\New folder\Software Engineer\Project-SE\SE-Project)
+2026-01-06 13:30:01.052 [main] INFO  com.demo.lms.LmsApplication - No active profile set, falling back to 1 default profile: "default"
+2026-01-06 13:30:07.586 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-01-06 13:30:08.044 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 399 ms. Found 5 JPA repository interfaces.
+2026-01-06 13:30:11.293 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-06 13:30:11.363 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-06 13:30:11.365 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.41]
+2026-01-06 13:30:11.741 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-06 13:30:11.743 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 10499 ms
+2026-01-06 13:30:12.382 [main] DEBUG o.s.b.web.servlet.ServletContextInitializerBeans - Mapping filters: webMvcObservationFilter urls=[/*] order=-2147483647, springSecurityFilterChain urls=[/*] order=-100, resourceUrlEncodingFilter urls=[/*] order=2147483647, characterEncodingFilter urls=[/*] order=-2147483648, formContentFilter urls=[/*] order=-9900, requestContextFilter urls=[/*] order=-105, jwtFilter urls=[/*] order=2147483647
+2026-01-06 13:30:12.387 [main] DEBUG o.s.b.web.servlet.ServletContextInitializerBeans - Mapping servlets: dispatcherServlet urls=[/]
+2026-01-06 13:30:13.532 [main] INFO  com.zaxxer.hikari.HikariDataSource - LMS-HikariPool - Starting...
+2026-01-06 13:30:14.525 [main] INFO  com.zaxxer.hikari.pool.HikariPool - LMS-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@57bd9c2b
+2026-01-06 13:30:14.628 [main] INFO  com.zaxxer.hikari.HikariDataSource - LMS-HikariPool - Start completed.
+2026-01-06 13:30:14.917 [main] INFO  org.flywaydb.core.FlywayExecutor - Database: jdbc:mysql://localhost:3306/lms_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true (MySQL 8.0)
+2026-01-06 13:30:15.177 [main] INFO  org.flywaydb.core.internal.command.DbValidate - Successfully validated 2 migrations (execution time 00:00.136s)
+2026-01-06 13:30:15.238 [main] INFO  org.flywaydb.core.internal.command.DbMigrate - Current version of schema `lms_db`: 2
+2026-01-06 13:30:15.253 [main] INFO  org.flywaydb.core.internal.command.DbMigrate - Schema `lms_db` is up to date. No migration necessary.
+2026-01-06 13:30:15.681 [main] INFO  org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-01-06 13:30:16.040 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.15.Final
+2026-01-06 13:30:16.240 [main] INFO  o.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-01-06 13:30:17.622 [main] INFO  o.s.o.j.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-01-06 13:30:17.855 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-01-06 13:30:17.918 [main] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (LMS-HikariPool)']
+	Database driver: undefined/unknown
+	Database version: 8.0.41
+>>>>>>> Stashed changes
 	Autocommit mode: undefined/unknown
 	Isolation level: undefined/unknown
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
+<<<<<<< Updated upstream
 2025-12-17 11:25:07.991 [main] INFO  o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
 2025-12-17 11:25:08.023 [main] DEBUG org.hibernate.SQL - 
     alter table audit_logs 
@@ -7311,6 +7348,22 @@ This generated password is for development use only. Your security configuration
 2025-12-17 12:59:31.451 [main] INFO  com.demo.lms.config.DatabaseInitializer - Starting database initialization...
 2025-12-17 12:59:31.451 [main] INFO  com.demo.lms.config.DatabaseInitializer - Checking and initializing default roles...
 2025-12-17 12:59:31.523 [main] DEBUG org.hibernate.SQL - 
+=======
+2026-01-06 13:30:22.440 [main] INFO  o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-01-06 13:30:22.636 [main] DEBUG org.hibernate.SQL - 
+    alter table notifications 
+       modify column type enum ('DUE_REMINDER','OVERDUE_ALERT','RESERVATION_READY','SYSTEM')
+2026-01-06 13:30:23.068 [main] INFO  o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-01-06 13:30:24.736 [main] INFO  o.s.data.jpa.repository.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-01-06 13:30:27.993 [main] INFO  o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2026-01-06 13:30:29.403 [main] INFO  o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoints beneath base path '/actuator'
+2026-01-06 13:30:29.689 [main] WARN  o.s.s.c.a.w.c.AuthorizeHttpRequestsConfigurer$AuthorizationManagerRequestMatcherRegistry - One of the patterns in [*.html, *.css, *.js, *.png, *.jpg, *.ico] is missing a leading slash. This is discouraged; please include the leading slash in all your request matcher patterns. In future versions of Spring Security, leaving out the leading slash will result in an exception.
+2026-01-06 13:30:31.164 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-01-06 13:30:31.194 [main] INFO  com.demo.lms.LmsApplication - Started LmsApplication in 31.48 seconds (process running for 33.09)
+2026-01-06 13:30:31.215 [main] INFO  com.demo.lms.config.DatabaseInitializer - Starting database initialization...
+2026-01-06 13:30:31.216 [main] INFO  com.demo.lms.config.DatabaseInitializer - Checking and initializing default roles...
+2026-01-06 13:30:31.432 [main] DEBUG org.hibernate.SQL - 
+>>>>>>> Stashed changes
     /* <criteria> */ select
         r1_0.id,
         r1_0.name 
@@ -7318,7 +7371,11 @@ This generated password is for development use only. Your security configuration
         roles r1_0 
     where
         r1_0.name=?
+<<<<<<< Updated upstream
 2025-12-17 12:59:31.548 [main] DEBUG org.hibernate.SQL - 
+=======
+2026-01-06 13:30:31.499 [main] DEBUG org.hibernate.SQL - 
+>>>>>>> Stashed changes
     /* <criteria> */ select
         r1_0.id,
         r1_0.name 
@@ -7326,7 +7383,11 @@ This generated password is for development use only. Your security configuration
         roles r1_0 
     where
         r1_0.name=?
+<<<<<<< Updated upstream
 2025-12-17 12:59:31.550 [main] DEBUG org.hibernate.SQL - 
+=======
+2026-01-06 13:30:31.503 [main] DEBUG org.hibernate.SQL - 
+>>>>>>> Stashed changes
     /* <criteria> */ select
         r1_0.id,
         r1_0.name 
@@ -7334,6 +7395,7 @@ This generated password is for development use only. Your security configuration
         roles r1_0 
     where
         r1_0.name=?
+<<<<<<< Updated upstream
 2025-12-17 12:59:31.551 [main] INFO  com.demo.lms.config.DatabaseInitializer - Role initialization completed. Available roles: ADMIN
 2025-12-17 12:59:31.551 [main] INFO  com.demo.lms.config.DatabaseInitializer - Database initialization completed successfully!
 2025-12-17 12:59:34.841 [SpringApplicationShutdownHook] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
@@ -10318,3 +10380,48 @@ This generated password is for development use only. Your security configuration
 2025-12-17 14:13:20.261 [http-nio-8765-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 1 ms
 2025-12-17 14:13:20.621 [http-nio-8765-exec-1] INFO  org.springdoc.api.AbstractOpenApiResource - Init duration for springdoc-openapi is: 309 ms
 2025-12-17 14:50:25.965 [LMS-HikariPool:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - LMS-HikariPool - Thread starvation or clock leap detected (housekeeper delta=7m39s214ms297µs500ns).
+=======
+2026-01-06 13:30:31.506 [main] INFO  com.demo.lms.config.DatabaseInitializer - Role initialization completed. Available roles: ADMIN
+2026-01-06 13:30:31.507 [main] INFO  com.demo.lms.config.DatabaseInitializer - Database initialization completed successfully!
+2026-01-06 13:30:31.903 [http-nio-8080-exec-1] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-06 13:30:31.904 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-06 13:30:31.907 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-01-06 13:30:32.110 [http-nio-8080-exec-1] INFO  c.d.lms.controller.product.ProductViewController - Displaying create product form
+2026-01-06 13:30:32.158 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        bc1_0.id,
+        bc1_0.description,
+        bc1_0.name 
+    from
+        book_categories bc1_0
+2026-01-06 13:30:32.178 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        b1_0.id,
+        b1_0.author,
+        b1_0.category_id,
+        b1_0.created_at,
+        b1_0.isbn,
+        b1_0.title,
+        b1_0.updated_at,
+        b1_0.user_id 
+    from
+        books b1_0
+2026-01-06 13:37:20.654 [http-nio-8080-exec-4] INFO  com.demo.lms.controller.user.UserViewController - Displaying user management page
+2026-01-06 13:37:20.679 [http-nio-8080-exec-4] DEBUG org.hibernate.SQL - 
+    /* <criteria> */ select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.enabled,
+        u1_0.name,
+        u1_0.password,
+        u1_0.role,
+        u1_0.updated_at 
+    from
+        users u1_0
+2026-01-06 14:03:04.468 [SpringApplicationShutdownHook] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-01-06 14:03:04.508 [tomcat-shutdown] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-01-06 14:03:04.576 [SpringApplicationShutdownHook] INFO  o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-01-06 14:03:04.614 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - LMS-HikariPool - Shutdown initiated...
+2026-01-06 14:03:04.624 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - LMS-HikariPool - Shutdown completed.
+>>>>>>> Stashed changes
