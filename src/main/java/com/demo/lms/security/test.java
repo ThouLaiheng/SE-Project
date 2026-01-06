@@ -1,4 +1,1 @@
-package com.demo.lms.security;
 
-public class test {
-}

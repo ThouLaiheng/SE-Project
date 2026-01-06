@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - Library Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .btn-create {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-create:hover {
+            background: #0056b3;
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .user-table thead {
+            background: #f8f9fa;
+        }
+
+        .user-table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .user-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+            color: #666;
+        }
+
+        .user-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .user-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #333;
+        }
+
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .form-group input.error {
+            border-color: #dc3545;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-submit:hover {
+            background: #0056b3;
+        }
+
+        .btn-submit:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state p {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-admin {
+            background: #dc3545;
+            color: white;
+        }
+
+        .badge-user {
+            background: #28a745;
+            color: white;
+        }
+
+        @media (max-width: 600px) {
+            .user-table {
+                font-size: 12px;
+            }
+            .user-table th,
+            .user-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>User Management</h1>
+            <button class="btn-create" onclick="openModal()">Create User</button>
+        </div>
+
+        <!-- Success Message -->
+        <div th:if="${success}" class="alert alert-success">
+            <span th:text="${success}">User created successfully!</span>
+        </div>
+
+        <!-- Error Message -->
+        <div th:if="${error}" class="alert alert-error">
+            <span th:text="${error}">An error occurred!</span>
+        </div>
+
+        <!-- User Table -->
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${users != null and !users.empty}" th:each="user, iter : ${users}">
+                    <td th:text="${iter.count}">1</td>
+                    <td>
+                        <div class="user-image">👤</div>
+                    </td>
+                    <td th:text="${user.name}">User Name</td>
+                    <td th:text="${user.email}">user@example.com</td>
+                    <td>
+                        <span th:if="${user.role == 'ADMIN'}" class="badge badge-admin">ADMIN</span>
+                        <span th:if="${user.role != 'ADMIN'}" class="badge badge-user" th:text="${user.role ?: 'USER'}">USER</span>
+                    </td>
+                    <td th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01</td>
+                </tr>
+                <tr th:if="${users == null or users.empty}">
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <h3>👥 No Users Yet</h3>
+                            <p>Click "Create User" to add your first user to the system</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New User</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+
+            <form id="createUserForm" th:action="@{/createUser}" method="post">
+                <div class="form-group">
+                    <label for="name">Full Name <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" placeholder="Enter full name" required>
+                    <span class="error-message" id="nameError">Name is required</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" placeholder="Enter email address" required>
+                    <span class="error-message" id="emailError">Valid email is required</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password <span class="required">*</span></label>
+                    <input type="password" id="password" name="password" placeholder="Enter password" required minlength="6">
+                    <span class="error-message" id="passwordError">Password must be at least 6 characters</span>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">Create User</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('userModal');
+        const form = document.getElementById('createUserForm');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function openModal() {
+            modal.classList.add('show');
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+            form.reset();
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Real-time validation
+        nameInput.addEventListener('input', () => validateField(nameInput, 'nameError'));
+        emailInput.addEventListener('input', () => validateField(emailInput, 'emailError'));
+        passwordInput.addEventListener('input', () => validateField(passwordInput, 'passwordError'));
+
+        function validateField(input, errorId) {
+            const errorElement = document.getElementById(errorId);
+            
+            if (!input.validity.valid) {
+                input.classList.add('error');
+                errorElement.classList.add('show');
+                return false;
+            } else {
+                input.classList.remove('error');
+                errorElement.classList.remove('show');
+                return true;
+            }
+        }
+
+        form.addEventListener('submit', (e) => {
+            let isValid = true;
+            
+            isValid = validateField(nameInput, 'nameError') && isValid;
+            isValid = validateField(emailInput, 'emailError') && isValid;
+            isValid = validateField(passwordInput, 'passwordError') && isValid;
+
+            if (!isValid) {
+                e.preventDefault();
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Creating...';
+            }
+        });
+
+        // Auto-hide alerts after 5 seconds
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        });
+
+        // Auto-open modal if there's an error
+        const hasError = document.querySelector('.alert-error');
+        if (hasError) {
+            openModal();
+        }
+    </script>
+</body>
+</html>

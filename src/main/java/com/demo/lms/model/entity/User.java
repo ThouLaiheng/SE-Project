@@ -13,18 +13,25 @@ import java.util.Set;
 @Setter
 public class User extends BaseEntity {
 
+    public static User user;
+
     @Column(nullable = false, length = 100)
     private String name;
 
     @Column(nullable = false, unique = true, length = 150)
-    private String email;
+    public String email;
 
     @Column(nullable = false)
-    private String password;
+    public String password;
 
     @Column(nullable = false)
     private boolean enabled = true;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<UserRole> userRoles;
+
+    public String role;
+
+    public User() {
+    }
 }
