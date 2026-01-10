@@ -99,9 +99,10 @@ loginFormElement.addEventListener('submit', async (e) => {
         const data = await response.json();
         
         if (response.ok) {
-            // Store token in localStorage
+            // Store token and user info in localStorage
             localStorage.setItem('token', data.token);
             localStorage.setItem('email', data.email);
+            localStorage.setItem('roles', JSON.stringify(data.roles || []));
             
             // Show success message
             showSuccess(loginError, '✓ Login successful! Redirecting...');

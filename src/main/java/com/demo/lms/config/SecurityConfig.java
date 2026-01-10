@@ -71,10 +71,12 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/**").permitAll()
                 // API documentation endpoint - public access
                 .requestMatchers("/api/docs/**").permitAll()
-                // Thymeleaf UI endpoints - public access
-                .requestMatchers("/createProduct", "/createUser").permitAll()
+                // Thymeleaf UI endpoints - public access (allow subpaths)
+                .requestMatchers("/createProduct/**", "/createUser/**", "/createReport/**", "/createSetting/**").permitAll()
+                .requestMatchers("/users/**").permitAll()
                 // Allow all other requests (development mode)
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
+
             )
             .addFilterBefore(jwtFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
 

@@ -27,4 +27,10 @@ public class Book extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     public User user;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(name = "image_url", length = 512)
+    private String imageUrl;
 }

@@ -37,7 +37,14 @@ public class AuthenticationController {
         String email = loginRequest.getEmail() == null ? null : loginRequest.getEmail().trim().toLowerCase();
         return userRepository.findByEmail(email)
             .filter(u -> encoder.matches(loginRequest.getPassword(), u.password))
-            .<ResponseEntity<?>>map(u -> ResponseEntity.ok(new AuthResponse(u.email, jwtUtil.generateToken(u.email))))
+            .<ResponseEntity<?>>map(u -> {
+                // Get user roles
+                var userWithRoles = userRepository.findByIdWithRoles(u.getId()).orElse(u);
+                var roles = userWithRoles.getUserRoles().stream()
+                    .map(ur -> ur.getRole().getName().name())
+                    .toList();
+                return ResponseEntity.ok(new AuthResponse(u.email, jwtUtil.generateToken(u.email), roles));
+            })
             .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("error", "Invalid credentials")));
         }
@@ -56,7 +63,8 @@ public class AuthenticationController {
         user.role = "USER";
         userRepository.save(user);
         String token = jwtUtil.generateToken(user.getEmail());
-        return new ResponseEntity<>(new AuthResponse(user.getEmail(), token), HttpStatus.CREATED);
+        // For new users, default role is STUDENT
+        return new ResponseEntity<>(new AuthResponse(user.getEmail(), token, java.util.List.of("STUDENT")), HttpStatus.CREATED);
     }
     
     

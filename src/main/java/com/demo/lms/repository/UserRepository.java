@@ -28,4 +28,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
         WHERE u.id = :id
     """)
     Optional<User> findByIdWithRoles(Long id);
+
+    @Query("""
+        SELECT COUNT(DISTINCT u)
+        FROM User u
+        JOIN u.userRoles ur
+        JOIN ur.role r
+        WHERE r.name = :roleName
+    """)
+    long countByRole(com.demo.lms.model.enums.UserRoleType roleName);
 }

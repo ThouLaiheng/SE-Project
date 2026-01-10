@@ -54,6 +54,8 @@ public class ProductViewController {
             @RequestParam("title") String title,
             @RequestParam("author") String author,
             @RequestParam("isbn") String isbn,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "imageUrl", required = false) String imageUrl,
             @RequestParam(value = "categoryId", required = false) Long categoryId,
             Model model,
             RedirectAttributes redirectAttributes) {
@@ -67,8 +69,11 @@ public class ProductViewController {
                 model.addAttribute("title", title);
                 model.addAttribute("author", author);
                 model.addAttribute("isbn", isbn);
+                model.addAttribute("description", description);
+                model.addAttribute("imageUrl", imageUrl);
                 model.addAttribute("categoryId", categoryId);
                 model.addAttribute("categories", bookCategoryRepository.findAll());
+                model.addAttribute("books", bookRepository.findAll());
                 return "createProduct";
             }
             
@@ -77,8 +82,11 @@ public class ProductViewController {
                 model.addAttribute("title", title);
                 model.addAttribute("author", author);
                 model.addAttribute("isbn", isbn);
+                model.addAttribute("description", description);
+                model.addAttribute("imageUrl", imageUrl);
                 model.addAttribute("categoryId", categoryId);
                 model.addAttribute("categories", bookCategoryRepository.findAll());
+                model.addAttribute("books", bookRepository.findAll());
                 return "createProduct";
             }
             
@@ -87,8 +95,11 @@ public class ProductViewController {
                 model.addAttribute("title", title);
                 model.addAttribute("author", author);
                 model.addAttribute("isbn", isbn);
+                model.addAttribute("description", description);
+                model.addAttribute("imageUrl", imageUrl);
                 model.addAttribute("categoryId", categoryId);
                 model.addAttribute("categories", bookCategoryRepository.findAll());
+                model.addAttribute("books", bookRepository.findAll());
                 return "createProduct";
             }
             
@@ -98,8 +109,11 @@ public class ProductViewController {
                 model.addAttribute("title", title);
                 model.addAttribute("author", author);
                 model.addAttribute("isbn", isbn);
+                model.addAttribute("description", description);
+                model.addAttribute("imageUrl", imageUrl);
                 model.addAttribute("categoryId", categoryId);
                 model.addAttribute("categories", bookCategoryRepository.findAll());
+                model.addAttribute("books", bookRepository.findAll());
                 return "createProduct";
             }
             
@@ -108,6 +122,8 @@ public class ProductViewController {
             book.setTitle(title);
             book.setAuthor(author);
             book.setIsbn(isbn);
+            book.setDescription(description);
+            book.setImageUrl(imageUrl);
             
             // Set category if provided
             if (categoryId != null) {
@@ -134,8 +150,11 @@ public class ProductViewController {
             model.addAttribute("title", title);
             model.addAttribute("author", author);
             model.addAttribute("isbn", isbn);
+            model.addAttribute("description", description);
+            model.addAttribute("imageUrl", imageUrl);
             model.addAttribute("categoryId", categoryId);
             model.addAttribute("categories", bookCategoryRepository.findAll());
+            model.addAttribute("books", bookRepository.findAll());
             return "createProduct";
         }
     }

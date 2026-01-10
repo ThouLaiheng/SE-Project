@@ -264,6 +264,26 @@
             color: white;
         }
 
+        .btn-delete {
+            padding: 6px 12px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .btn-delete:active {
+            transform: scale(0.98);
+        }
+
         @media (max-width: 600px) {
             .user-table {
                 font-size: 12px;
@@ -274,6 +294,25 @@
             }
         }
     </style>
+    <script>
+        // Fallback: ensure modal helpers exist even if external JS fails to load
+        (function(){
+            if (!window.openModal) {
+                window.openModal = function(){
+                    var m = document.getElementById('userModal');
+                    if (m) m.classList.add('show');
+                };
+            }
+            if (!window.closeModal) {
+                window.closeModal = function(){
+                    var m = document.getElementById('userModal');
+                    var f = document.getElementById('createUserForm');
+                    if (m) m.classList.remove('show');
+                    if (f) f.reset();
+                };
+            }
+        })();
+    </script>
 </head>
 <body>
     <div class="container">
@@ -302,6 +341,7 @@
                     <th>Email</th>
                     <th>Role</th>
                     <th>Created At</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -316,10 +356,13 @@
                         <span th:if="${user.role == 'ADMIN'}" class="badge badge-admin">ADMIN</span>
                         <span th:if="${user.role != 'ADMIN'}" class="badge badge-user" th:text="${user.role ?: 'USER'}">USER</span>
                     </td>
-                    <td th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01</td>
+                    <td th:text="${user.createdAt != null ? #temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm') : ''}">2024-01-01</td>
+                    <td>
+                        <button class="btn-delete" th:attr="data-user-id=${user.id},data-user-name=${user.name}">Delete</button>
+                    </td>
                 </tr>
                 <tr th:if="${users == null or users.empty}">
-                    <td colspan="6">
+                    <td colspan="7">
                         <div class="empty-state">
                             <h3>👥 No Users Yet</h3>
                             <p>Click "Create User" to add your first user to the system</p>
@@ -362,77 +405,6 @@
         </div>
     </div>
 
-    <script>
-        const modal = document.getElementById('userModal');
-        const form = document.getElementById('createUserForm');
-        const nameInput = document.getElementById('name');
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const submitBtn = document.getElementById('submitBtn');
-
-        function openModal() {
-            modal.classList.add('show');
-        }
-
-        function closeModal() {
-            modal.classList.remove('show');
-            form.reset();
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                closeModal();
-            }
-        }
-
-        // Real-time validation
-        nameInput.addEventListener('input', () => validateField(nameInput, 'nameError'));
-        emailInput.addEventListener('input', () => validateField(emailInput, 'emailError'));
-        passwordInput.addEventListener('input', () => validateField(passwordInput, 'passwordError'));
-
-        function validateField(input, errorId) {
-            const errorElement = document.getElementById(errorId);
-            
-            if (!input.validity.valid) {
-                input.classList.add('error');
-                errorElement.classList.add('show');
-                return false;
-            } else {
-                input.classList.remove('error');
-                errorElement.classList.remove('show');
-                return true;
-            }
-        }
-
-        form.addEventListener('submit', (e) => {
-            let isValid = true;
-            
-            isValid = validateField(nameInput, 'nameError') && isValid;
-            isValid = validateField(emailInput, 'emailError') && isValid;
-            isValid = validateField(passwordInput, 'passwordError') && isValid;
-
-            if (!isValid) {
-                e.preventDefault();
-            } else {
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Creating...';
-            }
-        });
-
-        // Auto-hide alerts after 5 seconds
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(alert => {
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 5000);
-        });
-
-        // Auto-open modal if there's an error
-        const hasError = document.querySelector('.alert-error');
-        if (hasError) {
-            openModal();
-        }
-    </script>
+    <script src="/js/createUser.js" defer></script>
 </body>
 </html>

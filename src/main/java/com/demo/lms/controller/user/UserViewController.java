@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -110,6 +111,46 @@ public class UserViewController {
             model.addAttribute("error", "Failed to create user: " + e.getMessage());
             model.addAttribute("users", userRepository.findAll());
             return "createUser";
+        }
+    }
+
+    /**
+     * Handle user deletion by ID
+     */
+    @PostMapping("/deleteUser/{id}")
+    public String deleteUser(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            log.info("Processing user deletion request for ID: {}", id);
+            
+            // Check if user exists
+            if (!userRepository.existsById(id)) {
+                log.warn("User with ID {} not found", id);
+                redirectAttributes.addFlashAttribute("error", 
+                    "User not found with ID: " + id);
+                return "redirect:/createUser";
+            }
+            
+            // Get user name before deletion for logging
+            User user = userRepository.findById(id).orElse(null);
+            String userName = user != null ? user.getName() : "Unknown";
+            
+            // Delete the user
+            userRepository.deleteById(id);
+            log.info("User deleted successfully - ID: {}, Name: {}", id, userName);
+            
+            redirectAttributes.addFlashAttribute("success", 
+                "User '" + userName + "' deleted successfully!");
+            
+            return "redirect:/createUser";
+            
+        } catch (Exception e) {
+            log.error("Error deleting user with ID: {}", id, e);
+            redirectAttributes.addFlashAttribute("error", 
+                "Failed to delete user: " + e.getMessage());
+            return "redirect:/createUser";
         }
     }
 }
