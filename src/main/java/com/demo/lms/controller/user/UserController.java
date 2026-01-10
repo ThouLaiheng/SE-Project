@@ -2,7 +2,7 @@ package com.demo.lms.controller.user;
 
 import com.demo.lms.dto.request.CreateUserRequest;
 import com.demo.lms.dto.request.UpdateUserRequest;
-import com.demo.lms.dto.result.SuccessResponse;
+import com.demo.lms.dto.common.SuccessResponse;
 import com.demo.lms.dto.response.UserResponse;
 import com.demo.lms.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;

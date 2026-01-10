@@ -1,0 +1,67 @@
+@startuml LMS_Flow
+title Library Management System - System Flow
+
+start
+
+:User registers / logs in;
+
+if (Authenticated?) then (Yes)
+
+  :Browse books;
+  :View book details;
+
+  if (Book available?) then (Yes)
+    :Reserve book;
+    :Reservation status = PENDING;
+
+    if (Admin approves reservation?) then (Yes)
+      :Reservation status = APPROVED;
+      :Notification sent;
+    else (No)
+      :Reservation remains pending;
+    endif
+
+    :Borrow book copy;
+    :Set borrow date;
+    :Set due date (+14 days);
+    :Borrow status = BORROWED;
+    :Audit log created;
+
+    if (Due date reached?) then (Yes)
+      if (Book returned?) then (Yes)
+        :Check return date;
+
+        if (Returned late?) then (Yes)
+          :Mark status = OVERDUE;
+          :Create fine;
+          :Notify user;
+        else (No)
+          :Mark status = RETURNED;
+        endif
+
+        :Book copy available;
+        :Audit log created;
+
+      else (No)
+        :Auto mark OVERDUE;
+        :Create fine;
+        :Notify user;
+      endif
+    endif
+
+    if (Fine exists?) then (Yes)
+      :User pays fine;
+      :Mark fine as PAID;
+      :Audit log created;
+    endif
+
+  else (No)
+    :Show not available message;
+  endif
+
+else (No)
+  :Access denied;
+endif
+
+stop
+@enduml

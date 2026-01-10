@@ -29,6 +29,8 @@ import java.util.Set;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
+    private static final String USER_NOT_FOUND_MESSAGE = "User not found with id: ";
+
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserRoleRepository userRoleRepository;
@@ -87,9 +89,8 @@ public class UserServiceImpl implements UserService {
         log.info("Updating user with ID: {}", id);
 
         User user = userRepository.findByIdWithRoles(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_MESSAGE + id));
 
-        // Check if email is being changed and if it already exists
         if (!user.getEmail().equals(request.getEmail())) {
             Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
             if (existingUser.isPresent() && !existingUser.get().getId().equals(id)) {
@@ -97,16 +98,13 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        // Update user fields
         user.setName(request.getName());
         user.setEmail(request.getEmail());
 
-        // Update password only if provided
         if (StringUtils.hasText(request.getPassword())) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
 
-        // Update enabled status if provided
         if (request.getEnabled() != null) {
             user.setEnabled(request.getEnabled());
         }
@@ -123,12 +121,9 @@ public class UserServiceImpl implements UserService {
         log.info("Deleting user with ID: {}", id);
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_MESSAGE + id));
 
-        // Delete user roles first (due to foreign key constraints)
         userRoleRepository.deleteByUserId(id);
-
-        // Delete the user
         userRepository.delete(user);
 
         log.info("User deleted successfully with ID: {}", id);
@@ -139,8 +134,8 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateUserStatus(Long id, boolean enabled) {
         log.info("Updating user status for ID: {} to enabled: {}", id, enabled);
 
-        User user = userRepository.findByIdWithRoles(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_MESSAGE + id));
 
         user.setEnabled(enabled);
         User updatedUser = userRepository.save(user);

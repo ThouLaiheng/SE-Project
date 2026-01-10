@@ -1,4 +1,4 @@
-package com.demo.lms.controller.user;
+package com.demo.lms.controller.auth;
 
 import com.demo.lms.Jwt.JwtUtil;
 import com.demo.lms.repository.UserRepository;
