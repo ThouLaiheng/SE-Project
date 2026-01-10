@@ -59,6 +59,24 @@
             background: #0056b3;
         }
 
+        .btn-back {
+            padding: 10px 20px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .btn-back:hover {
+            background: #5a6268;
+        }
+
         .product-table {
             width: 100%;
             border-collapse: collapse;
@@ -75,6 +93,10 @@
             font-weight: 600;
             color: #333;
             border-bottom: 2px solid #dee2e6;
+        }
+
+        .product-table th:last-child {
+            text-align: center;
         }
 
         .product-table td {
@@ -133,6 +155,11 @@
         }
 
         .modal-header h2 {
+            margin: 0;
+            color: #333;
+        }
+
+        #modalTitle {
             margin: 0;
             color: #333;
         }
@@ -258,8 +285,28 @@
                 grid-template-columns: 1fr;
             }
         }
-        .action-group { }
-        .btn-action {}
+        .action-group {
+            display: flex;
+            align-items: center; /* Vertically centers buttons */
+            justify-content: center; /* Horizontally centers buttons */
+            gap: 8px;
+        }
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+    
+    
+            height: 32px; 
+            padding: 0 12px;
+    
+   
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+        }
         .btn-edit { background: #17a2b8; color: white; }
         .btn-edit:hover { background: #138496; }
         .btn-delete { background: #dc3545; color: white; }
@@ -270,7 +317,10 @@
     <div class="container">
         <div class="header">
             <h1>Product Management</h1>
-            <button class="btn-create">Create Product</button>
+            <div>
+                <a href="/dashboard.html" class="btn-back">← Back to Dashboard</a>
+                <button class="btn-create">Create Product</button>
+            </div>
         </div>
 
         <!-- Success Message -->
@@ -313,8 +363,8 @@
                     <td th:text="${#temporals.format(book.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01</td>
                     <td>
                         <div class="action-group">
-                            <a th:href="@{/book/{id}/edit(id=${book.id})}" class="btn-action btn-edit">Update</a>
-                            <form th:action="@{/book/{id}/delete(id=${book.id})}" style="display: inline;" method="post" onsubmit="return confirm('Are you sure you want to delete this book?');">
+                            <button th:attr="data-book-id=${book.id},data-book-title=${book.title},data-book-author=${book.author},data-book-isbn=${book.isbn},data-book-description=${book.description},data-book-image=${book.imageUrl},data-category-id=${book.category != null ? book.category.id : ''}" class="btn-action btn-edit edit-btn">Update</button>
+                            <form th:action="@{/createProduct/{id}/delete(id=${book.id})}" style="display: inline;" method="post" onsubmit="return confirm('Are you sure you want to delete this book?');">
                                 <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                                 <button type="submit" class="btn-action btn-delete">Delete</button>
                             </form>
@@ -337,11 +387,12 @@
     <div id="productModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Create New Product</h2>
+                <h2 id="modalTitle">Create New Product</h2>
                 <span class="close" id="modalCloseBtn">&times;</span>
             </div>
 
             <form id="createProductForm" th:action="@{/createProduct}" method="post">
+                <input type="hidden" id="bookId" name="bookId" value="" />
                 <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
                 <div class="form-group">
@@ -376,7 +427,7 @@
 
                 <div class="form-group">
                     <label for="description">Description</label>
-                    <textarea id="description" name="description" rows="3" th:text="${description}"></textarea>
+                    <textarea id="description" name="description" rows="3" style="width: 100%; padding: 10px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; font-family: inherit;" th:text="${description}"></textarea>
                 </div>
 
                 <div class="form-group">
@@ -393,27 +444,74 @@
     (function () {
         const modal = document.getElementById('productModal');
         const form = document.getElementById('createProductForm');
+        const modalTitle = document.getElementById('modalTitle');
+        const bookIdInput = document.getElementById('bookId');
         const titleInput = document.getElementById('title');
         const authorInput = document.getElementById('author');
         const isbnInput = document.getElementById('isbn');
+        const descriptionInput = document.getElementById('description');
+        const imageUrlInput = document.getElementById('imageUrl');
+        const categoryIdInput = document.getElementById('categoryId');
         const submitBtn = document.getElementById('submitBtn');
         const createBtn = document.querySelector('.btn-create');
         const closeBtn = document.getElementById('modalCloseBtn');
+        const editBtns = document.querySelectorAll('.edit-btn');
 
-        function openModal() {
+        function openModal(mode = 'create', bookData = null) {
             if (modal) modal.classList.add('show');
+            
+            if (mode === 'edit' && bookData) {
+                // Edit mode
+                modalTitle.textContent = 'Update Product';
+                submitBtn.textContent = 'Update Product';
+                form.action = '/createProduct/' + bookData.id + '/update';
+                bookIdInput.value = bookData.id;
+                titleInput.value = bookData.title || '';
+                authorInput.value = bookData.author || '';
+                isbnInput.value = bookData.isbn || '';
+                descriptionInput.value = bookData.description || '';
+                imageUrlInput.value = bookData.imageUrl || '';
+                categoryIdInput.value = bookData.categoryId || '';
+            } else {
+                // Create mode
+                modalTitle.textContent = 'Create New Product';
+                submitBtn.textContent = 'Create Product';
+                form.action = '/createProduct';
+                bookIdInput.value = '';
+                if (form) form.reset();
+            }
         }
 
         function closeModal() {
             if (modal) modal.classList.remove('show');
             if (form) form.reset();
+            bookIdInput.value = '';
+            form.action = '/createProduct';
+            modalTitle.textContent = 'Create New Product';
+            submitBtn.textContent = 'Create Product';
         }
 
         // Expose for any inline handlers and ensure button opens/closes modal
         window.openModal = openModal;
         window.closeModal = closeModal;
-        if (createBtn) createBtn.addEventListener('click', openModal);
+        if (createBtn) createBtn.addEventListener('click', () => openModal('create'));
         if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+        // Add event listeners to all edit buttons
+        editBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const bookData = {
+                    id: this.getAttribute('data-book-id'),
+                    title: this.getAttribute('data-book-title'),
+                    author: this.getAttribute('data-book-author'),
+                    isbn: this.getAttribute('data-book-isbn'),
+                    description: this.getAttribute('data-book-description'),
+                    imageUrl: this.getAttribute('data-book-image'),
+                    categoryId: this.getAttribute('data-category-id')
+                };
+                openModal('edit', bookData);
+            });
+        });
 
         // Close modal when clicking outside
         window.addEventListener('click', function (event) {
@@ -454,7 +552,8 @@
                     e.preventDefault();
                 } else if (submitBtn) {
                     submitBtn.disabled = true;
-                    submitBtn.textContent = 'Creating...';
+                    const isEditMode = bookIdInput && bookIdInput.value;
+                    submitBtn.textContent = isEditMode ? 'Updating...' : 'Creating...';
                 }
             });
         }

@@ -135,6 +135,13 @@
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+
+                <!-- 🧪 In-memory DB for dev profile -->
+                <dependency>
+                        <groupId>com.h2database</groupId>
+                        <artifactId>h2</artifactId>
+                        <scope>runtime</scope>
+                </dependency>
     </dependencies>
 
     <!-- ✅ BUILD -->

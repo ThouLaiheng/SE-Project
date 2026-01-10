@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -156,6 +153,91 @@ public class ProductViewController {
             model.addAttribute("categories", bookCategoryRepository.findAll());
             model.addAttribute("books", bookRepository.findAll());
             return "createProduct";
+        }
+    }
+
+    /**
+     * Handle book update request
+     */
+    @PostMapping("/{id}/update")
+    public String updateProduct(
+            @PathVariable Long id,
+            @RequestParam("title") String title,
+            @RequestParam("author") String author,
+            @RequestParam("isbn") String isbn,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "imageUrl", required = false) String imageUrl,
+            @RequestParam(value = "categoryId", required = false) Long categoryId,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            log.info("Processing product update request for ID: {}", id);
+            
+            Book book = bookRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Book not found with ID: " + id));
+            
+            // Check if ISBN is changed and already exists
+            if (!book.getIsbn().equals(isbn) && bookRepository.existsByIsbn(isbn)) {
+                redirectAttributes.addFlashAttribute("error", "A book with this ISBN already exists");
+                return "redirect:/createProduct";
+            }
+            
+            // Update book fields
+            book.setTitle(title);
+            book.setAuthor(author);
+            book.setIsbn(isbn);
+            book.setDescription(description);
+            book.setImageUrl(imageUrl);
+            
+            // Set category if provided
+            if (categoryId != null) {
+                BookCategory category = bookCategoryRepository.findById(categoryId)
+                        .orElse(null);
+                book.setCategory(category);
+            } else {
+                book.setCategory(null);
+            }
+            
+            // Save updated book
+            bookRepository.save(book);
+            log.info("Book updated successfully with ID: {}", id);
+            
+            redirectAttributes.addFlashAttribute("success", "Book updated successfully!");
+            return "redirect:/createProduct";
+            
+        } catch (Exception e) {
+            log.error("Error updating book with ID: {}", id, e);
+            redirectAttributes.addFlashAttribute("error", "Failed to update book: " + e.getMessage());
+            return "redirect:/createProduct";
+        }
+    }
+
+    /**
+     * Handle book deletion request
+     */
+    @PostMapping("/{id}/delete")
+    public String deleteProduct(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            log.info("Processing product deletion request for ID: {}", id);
+            
+            if (!bookRepository.existsById(id)) {
+                redirectAttributes.addFlashAttribute("error", "Book not found with ID: " + id);
+                return "redirect:/createProduct";
+            }
+            
+            bookRepository.deleteById(id);
+            log.info("Book deleted successfully with ID: {}", id);
+            
+            redirectAttributes.addFlashAttribute("success", "Book deleted successfully!");
+            return "redirect:/createProduct";
+            
+        } catch (Exception e) {
+            log.error("Error deleting book with ID: {}", id, e);
+            redirectAttributes.addFlashAttribute("error", "Failed to delete book: " + e.getMessage());
+            return "redirect:/createProduct";
         }
     }
 }

@@ -1,28 +1,20 @@
 # Sample Users Documentation
 
-This file documents the sample users created by the V2__alter_users.sql migration.
+This document reflects the current sample users created and updated by migrations V2, V4, and V6.
 
-## Sample Users Created
+## Current Sample Users
 
-The migration creates three sample users with different roles for testing purposes:
+Two users are present for development/testing:
 
-### 1. Administrator User
+### 1. Librarian (Promoted to Admin)
 - **ID**: 1
-- **Name**: System Administrator  
-- **Email**: admin@lms.com
-- **Password**: admin123
-- **Role**: ADMIN
-- **Status**: Enabled
-
-### 2. Librarian User
-- **ID**: 2
-- **Name**: Head Librarian
-- **Email**: librarian@lms.com  
+- **Name**: Head Librarian  
+- **Email**: librarian@lms.com
 - **Password**: librarian123
-- **Role**: LIBRARIAN
+- **Roles**: ADMIN, LIBRARIAN
 - **Status**: Enabled
 
-### 3. Student User
+### 2. Student
 - **ID**: 3
 - **Name**: Demo Student
 - **Email**: student@lms.com
@@ -34,54 +26,43 @@ The migration creates three sample users with different roles for testing purpos
 
 ### ADMIN
 - Full system access
-- Can manage users, books, categories, and system settings
-- Can view all reports and audit logs
+- Manage users, books, categories, and system settings
+- View reports and audit logs
 
 ### LIBRARIAN
-- Can manage books and categories
-- Can handle book borrowing and returns
-- Can manage reservations and fines
-- Can view borrowing reports
+- Manage books and categories
+- Handle borrowing/returns, reservations, and fines
+- View borrowing reports
 
 ### STUDENT
-- Can browse books and categories
-- Can borrow and return books
-- Can make reservations
-- Can view personal borrowing history
+- Browse books and categories
+- Borrow/return books and make reservations
+- View personal borrowing history
 
 ## Security Notes
 
-- All passwords are BCrypt encrypted with strength 10
-- The sample passwords are for development/testing only
-- In production, ensure users change default passwords
-- Consider implementing password policy requirements
+- Passwords use BCrypt (strength 10)
+- Sample credentials are for dev/testing only
+- In production, require password changes and policies
 
 ## Migration Details
 
-The V2__alter_users.sql migration:
-1. Creates the required roles (ADMIN, LIBRARIAN, STUDENT)
-2. Inserts the sample users with encrypted passwords
-3. Assigns appropriate roles to each user
-4. Uses `INSERT IGNORE` to prevent conflicts if users already exist
-5. Clears existing user roles before reassigning them
+- [V2__alter_users.sql](SE-Project/src/main/resources/db/migration/V2__alter_users.sql): Creates roles and initial sample users
+- [V4__update_sample_users.sql](SE-Project/src/main/resources/db/migration/V4__update_sample_users.sql): Replaces admin with librarian (ID 1) and student (ID 3)
+- [V6__promote_librarian_to_admin.sql](SE-Project/src/main/resources/db/migration/V6__promote_librarian_to_admin.sql): Grants ADMIN role to librarian
 
 ## Testing the Sample Users
 
-You can test the API endpoints with these users:
+Try logging in via the API:
 
 ```bash
-# Login as Admin
-curl -X POST http://localhost:9090/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@lms.com","password":"admin123"}'
-
-# Login as Librarian  
-curl -X POST http://localhost:9090/api/auth/login \
+# Login as Librarian (Admin privileges)
+curl -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"librarian@lms.com","password":"librarian123"}'
 
 # Login as Student
-curl -X POST http://localhost:9090/api/auth/login \
+curl -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"student@lms.com","password":"student123"}'
 ```
