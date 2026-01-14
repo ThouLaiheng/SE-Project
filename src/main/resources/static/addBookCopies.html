@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Book Copies - Admin Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .form-group {
+          
+            
+            margin-bottom: 20px;
+            
+        }
+        label {
+        
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            background: #5B48E8;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #4736c7;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        .books-list {
+            display: flex;
+            flex-direction: column; 
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .book-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .book-item:hover {
+            background: #f9fafb;
+        }
+        .book-item.selected {
+            background: #e0e7ff;
+            border-color: #5B48E8;
+        }
+        .book-image {
+            width: 60px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .book-image-placeholder {
+            width: 60px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f3f4f6;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 24px;
+        }
+        .book-info {
+            text-align: left;
+        }
+        .select-all-container {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 5px;
+            display: flex;
+            justify-content: flex-start;
+        
+            
+        
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Add Book Copies (Admin)</h1>
+        <p>This tool helps you add physical copies to books in the library system, making them available for borrowing.</p>
+        
+        <p><strong>Logged in as:</strong> <span id="userEmail"></span></p>
+        
+        <div class="form-group">
+            <label>Select Books to Add Copies:</label>
+            <div class="select-all-container">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                    <span>Select All Books</span>
+                </label>
+            </div>
+            <div id="booksList" class="books-list"></div>
+        </div>
+        
+        <div class="form-group">
+            <label>Number of Copies to Add:</label>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <button onclick="decreaseCopies()" style="padding: 6px 12px; font-size: 16px;">−</button>
+                <input type="number" id="copiesCount" value="1" min="1" max="50" readonly style="text-align: center; font-size: 18px; font-weight: bold; width: 80px;">
+                <button onclick="increaseCopies()" style="padding: 6px 12px; font-size: 16px;">+</button>
+            </div>
+        </div>
+        
+        <button onclick="addCopiesToSelectedBooks()" style="width: 100%; padding: 10px; font-size: 16px;">Add Copies to Selected Books</button>
+        
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api';
+        let books = [];
+        let token = localStorage.getItem('token') || '';
+
+        // Display user email and load books on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const email = localStorage.getItem('email');
+            const token = localStorage.getItem('token');
+            
+            if (!email || !token) {
+                alert('Please log in first');
+                window.location.href = '/';
+                return;
+            }
+            
+            if (email) {
+                document.getElementById('userEmail').textContent = email;
+            }
+            
+            loadBooks();
+        });
+
+        async function loadBooks() {
+            try {
+                showResult('Loading books...', 'success');
+                const response = await fetch(`${API_BASE_URL}/books`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    books = await response.json();
+                    console.log('Loaded books:', books);
+                    if (books.length === 0) {
+                        showResult('No books found in the system.', 'error');
+                    } else {
+                        displayBooksList();
+                        showResult(`Loaded ${books.length} books successfully!`, 'success');
+                        setTimeout(() => {
+                            document.getElementById('result').style.display = 'none';
+                        }, 2000);
+                    }
+                } else {
+                    showResult('Failed to load books. Status: ' + response.status, 'error');
+                }
+            } catch (error) {
+                console.error('Error loading books:', error);
+                showResult('Error: ' + error.message, 'error');
+            }
+        }
+
+        function displayBooksList() {
+            const container = document.getElementById('booksList');
+            container.innerHTML = '';
+            
+            books.forEach(book => {
+                const div = document.createElement('div');
+                div.className = 'book-item';
+                div.dataset.bookId = book.id;
+                
+                const imageHtml = book.imageUrl 
+                    ? `<img src="${book.imageUrl}" class="book-image" alt="${book.title}">` 
+                    : `<div class="book-image-placeholder">📚</div>`;
+                
+                div.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px; width: 100%; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" class="book-checkbox" data-book-id="${book.id}" onclick="event.stopPropagation(); toggleBookSelection(${book.id})">
+                            ${imageHtml}
+                            <div class="book-info">
+                                <strong>${book.title}</strong> by ${book.author}<br>
+                                <small>Available: ${book.availableCopies} / Total: ${book.totalCopies}</small>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 5px;">
+                                <button onclick="event.stopPropagation(); adjustBookCopies(${book.id}, -1)" style="padding: 4px 10px; font-size: 14px;">−</button>
+                                <input type="number" id="copies-${book.id}" value="1" min="1" max="50" readonly style="width: 50px; text-align: center; font-size: 14px; padding: 4px;">
+                                <button onclick="event.stopPropagation(); adjustBookCopies(${book.id}, 1)" style="padding: 4px 10px; font-size: 14px;">+</button>
+                            </div>
+                            <button onclick="event.stopPropagation(); addCopiesToSingleBook(${book.id})" style="padding: 4px 12px; font-size: 14px; background: #10b981;">Add</button>
+                            <button onclick="event.stopPropagation(); removeCopiesFromBook(${book.id})" style="padding: 4px 12px; font-size: 14px; background: #ef4444;">Remove</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function toggleBookSelection(bookId) {
+            const bookItem = document.querySelector(`.book-item[data-book-id="${bookId}"]`);
+            const checkbox = bookItem.querySelector('.book-checkbox');
+            
+            checkbox.checked = !checkbox.checked;
+            bookItem.classList.toggle('selected', checkbox.checked);
+            
+            updateSelectAllCheckbox();
+        }
+
+        function adjustBookCopies(bookId, change) {
+            const input = document.getElementById(`copies-${bookId}`);
+            let value = parseInt(input.value);
+            value += change;
+            if (value >= 1 && value <= 50) {
+                input.value = value;
+            }
+        }
+
+        async function addCopiesToSingleBook(bookId) {
+            const count = parseInt(document.getElementById(`copies-${bookId}`).value);
+            let successCount = 0;
+            
+            showResult(`Adding ${count} copies...`, 'success');
+
+            for (let i = 0; i < count; i++) {
+                try {
+                    const copyCode = `COPY-${bookId}-${Date.now()}-${i}`;
+                    const response = await fetch(`${API_BASE_URL}/book-copies`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            bookId: bookId,
+                            copyCode: copyCode
+                        })
+                    });
+
+                    if (response.ok) {
+                        successCount++;
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                } catch (error) {
+                    console.error('Error adding copy:', error);
+                }
+            }
+
+            if (successCount > 0) {
+                showResult(`Successfully added ${successCount} copies!`, 'success');
+                await loadBooks();
+            } else {
+                showResult('Failed to add copies', 'error');
+            }
+        }
+
+        async function removeCopiesFromBook(bookId) {
+            const count = parseInt(document.getElementById(`copies-${bookId}`).value);
+            
+            if (!confirm(`This will mark ${count} available copies as unavailable (retired).\n\nThey will no longer be borrowable, but borrowing history will be preserved.\n\nContinue?`)) {
+                return;
+            }
+            
+            showResult(`Marking ${count} copies as unavailable...`, 'success');
+            
+            try {
+                // Get all available copies for this book
+                const response = await fetch(`${API_BASE_URL}/book-copies/book/${bookId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    showResult(`Failed to fetch book copies: ${response.status}`, 'error');
+                    return;
+                }
+
+                const allCopies = await response.json();
+                const availableCopies = allCopies.filter(copy => copy.available === true);
+                
+                if (availableCopies.length === 0) {
+                    showResult('No available copies to mark as unavailable', 'error');
+                    return;
+                }
+                
+                const copiesToUpdate = Math.min(count, availableCopies.length);
+                let successCount = 0;
+                
+                for (let i = 0; i < copiesToUpdate; i++) {
+                    try {
+                        const updateResponse = await fetch(`${API_BASE_URL}/book-copies/${availableCopies[i].id}/availability?available=false`, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+
+                        if (updateResponse.ok) {
+                            successCount++;
+                        }
+                        await new Promise(resolve => setTimeout(resolve, 50));
+                    } catch (error) {
+                        console.error('Error updating copy:', error);
+                    }
+                }
+
+                if (successCount > 0) {
+                    showResult(`Successfully marked ${successCount} copies as unavailable!`, 'success');
+                    await loadBooks();
+                } else {
+                    showResult('Failed to update copies', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showResult('Error: ' + error.message, 'error');
+            }
+        }
+
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.book-checkbox');
+            const bookItems = document.querySelectorAll('.book-item');
+            
+            checkboxes.forEach((checkbox, index) => {
+                checkbox.checked = selectAllCheckbox.checked;
+                bookItems[index].classList.toggle('selected', selectAllCheckbox.checked);
+            });
+        }
+
+        function updateSelectAllCheckbox() {
+            const checkboxes = document.querySelectorAll('.book-checkbox');
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            const someChecked = Array.from(checkboxes).some(cb => cb.checked);
+            
+            selectAllCheckbox.checked = allChecked;
+            selectAllCheckbox.indeterminate = someChecked && !allChecked;
+        }
+
+        function increaseCopies() {
+            const input = document.getElementById('copiesCount');
+            let value = parseInt(input.value);
+            if (value < 50) {
+                input.value = value + 1;
+            }
+        }
+
+        function decreaseCopies() {
+            const input = document.getElementById('copiesCount');
+            let value = parseInt(input.value);
+            if (value > 1) {
+                input.value = value - 1;
+            }
+        }
+
+        async function addCopiesToSelectedBooks() {
+            const selectedCheckboxes = document.querySelectorAll('.book-checkbox:checked');
+            const count = parseInt(document.getElementById('copiesCount').value);
+            
+            if (selectedCheckboxes.length === 0) {
+                showResult('Please select at least one book', 'error');
+                return;
+            }
+            
+            const selectedBookIds = Array.from(selectedCheckboxes).map(cb => parseInt(cb.dataset.bookId));
+            let totalSuccessCount = 0;
+            
+            showResult(`Adding ${count} copies to ${selectedBookIds.length} books...`, 'success');
+
+            for (const bookId of selectedBookIds) {
+                for (let i = 0; i < count; i++) {
+                    try {
+                        const copyCode = `COPY-${bookId}-${Date.now()}-${i}`;
+                        const response = await fetch(`${API_BASE_URL}/book-copies`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                bookId: bookId,
+                                copyCode: copyCode
+                            })
+                        });
+
+                        if (response.ok) {
+                            totalSuccessCount++;
+                        }
+                        // Small delay to avoid overwhelming the server
+                        await new Promise(resolve => setTimeout(resolve, 50));
+                    } catch (error) {
+                        console.error('Error adding copy:', error);
+                    }
+                }
+            }
+
+            if (totalSuccessCount > 0) {
+                showResult(`Successfully added ${totalSuccessCount} copies to ${selectedBookIds.length} books!`, 'success');
+                // Reload books
+                await loadBooks();
+            } else {
+                showResult('Failed to add copies', 'error');
+            }
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = message;
+            resultDiv.className = `result ${type}`;
+            resultDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+

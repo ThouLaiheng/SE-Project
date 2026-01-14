@@ -43,7 +43,7 @@
         }
 
         .btn-create {
-            padding: 10px 20px;
+            padding: 11px 20px;
             background: #007bff;
             color: white;
             border: none;
@@ -340,6 +340,8 @@
                     <th>No</th>
                     <th>Image</th>
                     <th>Title</th>
+                    <th>Author</th>
+                    <th>Category</th>
                     <th>Description</th>
                     <th>ISBN</th>
                     <th>Created At</th>
@@ -355,6 +357,11 @@
                         <img th:if="${book.imageUrl != null and not #strings.isEmpty(book.imageUrl)}" th:src="${book.imageUrl}" alt="Cover" class="product-image" />
                     </td>
                     <td th:text="${book.title}">Book Title</td>
+                    <td th:text="${book.author}">Author Name</td>
+                    <td>
+                        <span th:if="${book.category != null}" th:text="${book.category.name}">Category</span>
+                        <span th:if="${book.category == null}">—</span>
+                    </td>
                     <td>
                         <span th:if="${book.description != null and not #strings.isEmpty(book.description)}" th:text="${book.description}">Description</span>
                         <span th:if="${book.description == null or #strings.isEmpty(book.description)}">—</span>
@@ -372,7 +379,7 @@
                     </td>
                 </tr>
                 <tr th:if="${books == null or #lists.isEmpty(books)}">
-                    <td colspan="7">
+                    <td colspan="9">
                         <div class="empty-state">
                             <h3>📚 No Products Yet</h3>
                             <p>Click "Create Product" to add your first book to the inventory</p>
@@ -391,7 +398,7 @@
                 <span class="close" id="modalCloseBtn">&times;</span>
             </div>
 
-            <form id="createProductForm" th:action="@{/createProduct}" method="post">
+            <form id="createProductForm" th:action="@{/createProduct}" method="post" enctype="multipart/form-data">
                 <input type="hidden" id="bookId" name="bookId" value="" />
                 <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
@@ -416,7 +423,7 @@
                 <div class="form-group">
                     <label for="categoryId">Category</label>
                     <select id="categoryId" name="categoryId">
-                        <option value="" th:selected="${categoryId == null}">No Category</option>
+                        <option value="">Select a category</option>
                         <option th:each="cat : ${categories}"
                                 th:value="${cat.id}"
                                 th:text="${cat.name}"
@@ -431,8 +438,11 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="imageUrl">Image URL</label>
-                    <input id="imageUrl" name="imageUrl" type="url" placeholder="https://..." th:value="${imageUrl}" />
+                    <label for="imageFile">Image</label>
+                    <!-- Keep a hidden imageUrl to preserve current image during edits when no new file is chosen -->
+                    <input type="hidden" id="imageUrl" name="imageUrl" th:value="${imageUrl}" />
+                    <input id="imageFile" name="imageFile" type="file" accept="image/*" />
+                    <div id="fileInfo" style="margin-top: 8px; font-size: 0.85rem; color: #666;"></div>
                 </div>
 
                 <button id="submitBtn" type="submit" class="btn-submit">Create Product</button>
@@ -451,11 +461,27 @@
         const isbnInput = document.getElementById('isbn');
         const descriptionInput = document.getElementById('description');
         const imageUrlInput = document.getElementById('imageUrl');
+        const imageFileInput = document.getElementById('imageFile');
         const categoryIdInput = document.getElementById('categoryId');
         const submitBtn = document.getElementById('submitBtn');
         const createBtn = document.querySelector('.btn-create');
         const closeBtn = document.getElementById('modalCloseBtn');
         const editBtns = document.querySelectorAll('.edit-btn');
+        const fileInfo = document.getElementById('fileInfo');
+
+        // Show file selection feedback
+        if (imageFileInput && fileInfo) {
+            imageFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    fileInfo.textContent = `✓ Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+                    fileInfo.style.color = '#28a745';
+                    console.log('Image file selected:', file.name, file.size, 'bytes', file.type);
+                } else {
+                    fileInfo.textContent = '';
+                }
+            });
+        }
 
         function openModal(mode = 'create', bookData = null) {
             if (modal) modal.classList.add('show');
@@ -470,7 +496,7 @@
                 authorInput.value = bookData.author || '';
                 isbnInput.value = bookData.isbn || '';
                 descriptionInput.value = bookData.description || '';
-                imageUrlInput.value = bookData.imageUrl || '';
+                if (imageUrlInput) imageUrlInput.value = bookData.imageUrl || '';
                 categoryIdInput.value = bookData.categoryId || '';
             } else {
                 // Create mode
@@ -479,6 +505,7 @@
                 form.action = '/createProduct';
                 bookIdInput.value = '';
                 if (form) form.reset();
+                if (imageUrlInput) imageUrlInput.value = '';
             }
         }
 
@@ -547,6 +574,20 @@
                 isValid = validateField(titleInput, 'titleError') && isValid;
                 isValid = validateField(authorInput, 'authorError') && isValid;
                 isValid = validateField(isbnInput, 'isbnError') && isValid;
+
+                // Debug: Log form data
+                const formData = new FormData(form);
+                console.log('=== Form Submission Debug ===');
+                console.log('Form action:', form.action);
+                console.log('Form enctype:', form.enctype);
+                for (let [key, value] of formData.entries()) {
+                    if (value instanceof File) {
+                        console.log(key + ':', value.name, '-', value.size, 'bytes');
+                    } else {
+                        console.log(key + ':', value);
+                    }
+                }
+                console.log('=============================');
 
                 if (!isValid) {
                     e.preventDefault();

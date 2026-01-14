@@ -28,7 +28,7 @@ public class BorrowService {
     private final NotificationService notificationService;
     private final AuditLogService auditLogService;
 
-    public BorrowRecord borrow(Long bookCopyId, Long userId) {
+    public BorrowRecord borrow(Long bookCopyId, Long userId, int borrowDays) {
 
         BookCopy copy = bookCopyRepository.findById(bookCopyId)
                 .orElseThrow(() -> new EntityNotFoundException("Book copy not found"));
@@ -39,6 +39,12 @@ public class BorrowService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        
+        // Check if user has already borrowed 5 books (limit)
+        long currentBorrowCount = borrowRecordRepository.countByUserIdAndStatus(userId, BorrowStatus.BORROWED);
+        if (currentBorrowCount >= 5) {
+            throw new IllegalStateException("You have reached the maximum limit of 5 borrowed books. Please return a book before borrowing more.");
+        }
 
         copy.setAvailable(false);
 
@@ -46,7 +52,7 @@ public class BorrowService {
         record.setUser(user);
         record.setBookCopy(copy);
         record.setBorrowDate(LocalDateTime.now());
-        record.setDueDate(LocalDateTime.now().plusDays(14));
+        record.setDueDate(LocalDateTime.now().plusDays(borrowDays));
         record.setStatus(BorrowStatus.BORROWED);
 
         BorrowRecord saved = borrowRecordRepository.save(record);
@@ -71,31 +77,29 @@ public class BorrowService {
         BorrowRecord record = borrowRecordRepository.findById(borrowId)
                 .orElseThrow(() -> new EntityNotFoundException("Borrow record not found"));
 
-        if (!record.getUser().getId().equals(userId)) {
-            throw new IllegalStateException("You cannot return this book");
-        }
+        // Allow any authenticated user (admin/librarian) to mark books as returned
+        // No ownership check needed for librarians/admins managing student borrowings
 
         record.setReturnDate(LocalDateTime.now());
-
-        if (record.getReturnDate().isAfter(record.getDueDate())) {
-            record.setStatus(BorrowStatus.OVERDUE);
-        } else {
-            record.setStatus(BorrowStatus.RETURNED);
-        }
+        
+        // When a book is returned, it should always be marked as RETURNED
+        // regardless of whether it was returned late or on time
+        record.setStatus(BorrowStatus.RETURNED);
 
         record.getBookCopy().setAvailable(true);
         BorrowRecord saved = borrowRecordRepository.save(record);
 
         notificationService.notifyUser(
-                userId,
-                "You returned '" +
-                        record.getBookCopy().getBook().getTitle() + "'."
+                record.getUser().getId(),
+                "Your book '" +
+                        record.getBookCopy().getBook().getTitle() + "' has been marked as returned."
         );
 
         auditLogService.log(
                 userId,
-                "Returned book: " +
-                        record.getBookCopy().getBook().getTitle()
+                "Marked book as returned: " +
+                        record.getBookCopy().getBook().getTitle() + 
+                        " (Student: " + record.getUser().getName() + ")"
         );
 
         return saved;
@@ -104,5 +108,58 @@ public class BorrowService {
     @Transactional(readOnly = true)
     public List<BorrowRecord> myBorrows(Long userId) {
         return borrowRecordRepository.findByUserId(userId);
+    }
+    
+    @Transactional(readOnly = true)
+    public List<BorrowRecord> allBorrows() {
+        return borrowRecordRepository.findAll();
+    }
+    
+    public BorrowRecord markAsUnreturned(Long borrowId, Long userId) {
+        BorrowRecord record = borrowRecordRepository.findById(borrowId)
+                .orElseThrow(() -> new EntityNotFoundException("Borrow record not found"));
+        
+        // Set book copy as unavailable again
+        record.getBookCopy().setAvailable(false);
+        
+        // Reset return date and status
+        record.setReturnDate(null);
+        record.setStatus(BorrowStatus.BORROWED);
+        
+        BorrowRecord saved = borrowRecordRepository.save(record);
+        
+        notificationService.notifyUser(
+                record.getUser().getId(),
+                "Your book '" + record.getBookCopy().getBook().getTitle() + "' has been marked as unreturned."
+        );
+        
+        auditLogService.log(
+                userId,
+                "Marked book as unreturned: " + record.getBookCopy().getBook().getTitle() + 
+                " (Student: " + record.getUser().getName() + ")"
+        );
+        
+        return saved;
+    }
+    
+    public void deleteBorrowRecord(Long borrowId, Long userId) {
+        BorrowRecord record = borrowRecordRepository.findById(borrowId)
+                .orElseThrow(() -> new EntityNotFoundException("Borrow record not found"));
+        
+        // Allow any authenticated user (librarian/admin) to delete returned records
+        // No ownership check needed for managing student borrowings
+        
+        // Only allow deletion of returned records
+        if (record.getReturnDate() == null) {
+            throw new IllegalStateException("Cannot delete an active borrow record. Return the book first.");
+        }
+        
+        auditLogService.log(
+                userId,
+                "Deleted borrow record: " + record.getBookCopy().getBook().getTitle() + 
+                " (Student: " + record.getUser().getName() + ")"
+        );
+        
+        borrowRecordRepository.delete(record);
     }
 }

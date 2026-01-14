@@ -4,13 +4,23 @@ import com.demo.lms.model.entity.Book;
 import com.demo.lms.model.entity.BookCategory;
 import com.demo.lms.repository.BookCategoryRepository;
 import com.demo.lms.repository.BookRepository;
+import com.demo.lms.repository.BookCopyRepository;
+import com.demo.lms.repository.BorrowRecordRepository;
+import com.demo.lms.repository.ReservationRepository;
+import com.demo.lms.service.book.BookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 import java.util.List;
 
 /**
@@ -24,6 +34,12 @@ public class ProductViewController {
 
     private final BookRepository bookRepository;
     private final BookCategoryRepository bookCategoryRepository;
+    private final BookCopyRepository bookCopyRepository;
+    private final BorrowRecordRepository borrowRecordRepository;
+    private final ReservationRepository reservationRepository;
+    private final BookService bookService;
+
+    private static final String UPLOAD_DIR = "uploads"; // base folder for uploaded files
 
     /**
      * Display the create product (book) form
@@ -53,6 +69,7 @@ public class ProductViewController {
             @RequestParam("isbn") String isbn,
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "imageUrl", required = false) String imageUrl,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
             @RequestParam(value = "categoryId", required = false) Long categoryId,
             Model model,
             RedirectAttributes redirectAttributes) {
@@ -114,13 +131,45 @@ public class ProductViewController {
                 return "createProduct";
             }
             
+            // Handle optional image upload
+            String finalImageUrl = imageUrl;
+            log.info("Image upload check - imageFile: {}, isEmpty: {}, imageUrl: {}", 
+                imageFile != null ? imageFile.getOriginalFilename() : "null", 
+                imageFile != null ? imageFile.isEmpty() : "null",
+                imageUrl);
+            
+            if (imageFile != null && !imageFile.isEmpty()) {
+                try {
+                    // Ensure we use an absolute, normalized path so Tomcat doesn't resolve it under its temp directory
+                    Path dir = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
+                    log.info("Upload directory path (absolute): {}", dir);
+                    if (!Files.exists(dir)) {
+                        Files.createDirectories(dir);
+                        log.info("Created upload directory: {}", dir);
+                    }
+                    String original = imageFile.getOriginalFilename();
+                    String safeName = (original == null ? "image" : original).replaceAll("[^a-zA-Z0-9._-]", "_");
+                    String filename = UUID.randomUUID() + "_" + safeName;
+                    Path target = dir.resolve(filename).toAbsolutePath().normalize();
+                    log.info("Saving file to: {}", target);
+                    imageFile.transferTo(target.toFile());
+                    finalImageUrl = "/" + UPLOAD_DIR + "/" + filename;
+                    log.info("File saved successfully. URL: {}", finalImageUrl);
+                } catch (IOException ioe) {
+                    log.error("Failed to store uploaded image", ioe);
+                }
+            } else {
+                log.info("No image file uploaded, using existing URL: {}", finalImageUrl);
+            }
+
             // Create new book
             Book book = new Book();
             book.setTitle(title);
             book.setAuthor(author);
             book.setIsbn(isbn);
             book.setDescription(description);
-            book.setImageUrl(imageUrl);
+            book.setImageUrl(finalImageUrl);
+            log.info("Setting imageUrl for new book: {}", finalImageUrl);
             
             // Set category if provided
             if (categoryId != null) {
@@ -133,6 +182,17 @@ public class ProductViewController {
             
             // Save book
             Book savedBook = bookRepository.save(book);
+            // Ensure at least one available copy exists for borrowing
+            try {
+                com.demo.lms.model.entity.BookCopy copy = new com.demo.lms.model.entity.BookCopy();
+                copy.setBook(savedBook);
+                copy.setCopyCode("COPY-" + UUID.randomUUID());
+                copy.setAvailable(true);
+                bookCopyRepository.save(copy);
+                log.info("Created initial available copy for book ID: {}", savedBook.getId());
+            } catch (Exception ce) {
+                log.warn("Failed to create initial book copy: {}", ce.getMessage());
+            }
             log.info("Book created successfully with ID: {}", savedBook.getId());
             
             // Add success message
@@ -160,13 +220,14 @@ public class ProductViewController {
      * Handle book update request
      */
     @PostMapping("/{id}/update")
-    public String updateProduct(
+        public String updateProduct(
             @PathVariable Long id,
             @RequestParam("title") String title,
             @RequestParam("author") String author,
             @RequestParam("isbn") String isbn,
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "imageUrl", required = false) String imageUrl,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
             @RequestParam(value = "categoryId", required = false) Long categoryId,
             RedirectAttributes redirectAttributes) {
         
@@ -182,12 +243,31 @@ public class ProductViewController {
                 return "redirect:/createProduct";
             }
             
+            // Handle optional new image upload; fall back to provided URL or keep existing
+            String finalImageUrl = imageUrl;
+            if (imageFile != null && !imageFile.isEmpty()) {
+                try {
+                    Path dir = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
+                    if (!Files.exists(dir)) {
+                        Files.createDirectories(dir);
+                    }
+                    String original = imageFile.getOriginalFilename();
+                    String safeName = (original == null ? "image" : original).replaceAll("[^a-zA-Z0-9._-]", "_");
+                    String filename = UUID.randomUUID() + "_" + safeName;
+                    Path target = dir.resolve(filename).toAbsolutePath().normalize();
+                    imageFile.transferTo(target.toFile());
+                    finalImageUrl = "/" + UPLOAD_DIR + "/" + filename;
+                } catch (IOException ioe) {
+                    log.warn("Failed to store uploaded image: {}", ioe.getMessage());
+                }
+            }
+
             // Update book fields
             book.setTitle(title);
             book.setAuthor(author);
             book.setIsbn(isbn);
             book.setDescription(description);
-            book.setImageUrl(imageUrl);
+            book.setImageUrl(finalImageUrl);
             
             // Set category if provided
             if (categoryId != null) {
@@ -228,7 +308,8 @@ public class ProductViewController {
                 return "redirect:/createProduct";
             }
             
-            bookRepository.deleteById(id);
+            // Use BookService to properly handle cascade deletion
+            bookService.delete(id);
             log.info("Book deleted successfully with ID: {}", id);
             
             redirectAttributes.addFlashAttribute("success", "Book deleted successfully!");
@@ -238,6 +319,38 @@ public class ProductViewController {
             log.error("Error deleting book with ID: {}", id, e);
             redirectAttributes.addFlashAttribute("error", "Failed to delete book: " + e.getMessage());
             return "redirect:/createProduct";
+        }
+    }
+    
+    /**
+     * Clear all data (reservations, borrow records, book copies)
+     * This allows books to be deleted without foreign key constraint violations
+     */
+    @PostMapping("/cleanup-all")
+    @ResponseBody
+    public String clearAllData() {
+        try {
+            log.warn("⚠️ CLEARING ALL DATA - Reservations, Borrow Records, and Book Copies");
+            
+            long reservationsCount = reservationRepository.count();
+            long borrowRecordsCount = borrowRecordRepository.count();
+            long bookCopiesCount = bookCopyRepository.count();
+            
+            reservationRepository.deleteAll();
+            borrowRecordRepository.deleteAll();
+            bookCopyRepository.deleteAll();
+            
+            String message = String.format(
+                "✅ Successfully deleted: %d reservations, %d borrow records, %d book copies",
+                reservationsCount, borrowRecordsCount, bookCopiesCount
+            );
+            
+            log.info(message);
+            return message;
+            
+        } catch (Exception e) {
+            log.error("❌ Error clearing data: {}", e.getMessage(), e);
+            return "❌ Error: " + e.getMessage();
         }
     }
 }

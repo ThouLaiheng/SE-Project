@@ -20,7 +20,7 @@ public class BookCopy {
     @Column(nullable = false)
     private boolean available = true;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "book_id")
     private Book book;
 }

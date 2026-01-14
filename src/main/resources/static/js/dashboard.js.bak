@@ -27,11 +27,6 @@ function setupRoleBasedUI() {
     if (isAdmin) {
         // Admin sees everything
         cardsGrid.innerHTML = `
-            <div class="card" onclick="window.location.href='/addBookCopies.html'">
-                <div class="card-icon">📦</div>
-                <h3>Book Copies</h3>
-                <p>Manage book availability</p>
-            </div>
             <div class="card" onclick="window.location.href='/createProduct'">
                 <div class="card-icon">📚</div>
                 <h3>Books</h3>
@@ -52,20 +47,10 @@ function setupRoleBasedUI() {
                 <h3>Settings</h3>
                 <p>Configure system</p>
             </div>
-            <div class="card" onclick="window.location.href='/manageStudentBorrowings.html'">
-                <div class="card-icon">📋</div>
-                <h3>Manage Borrowings</h3>
-                <p>Track student borrowings</p>
-            </div>
         `;
     } else if (isLibrarian) {
         // Librarian sees books and reports only
         cardsGrid.innerHTML = `
-            <div class="card" onclick="window.location.href='/addBookCopies.html'">
-                <div class="card-icon">📦</div>
-                <h3>Book Copies</h3>
-                <p>Manage book availability</p>
-            </div>
             <div class="card" onclick="window.location.href='/createProduct'">
                 <div class="card-icon">📚</div>
                 <h3>Books</h3>
@@ -75,11 +60,6 @@ function setupRoleBasedUI() {
                 <div class="card-icon">📊</div>
                 <h3>Reports</h3>
                 <p>View statistics</p>
-            </div>
-            <div class="card" onclick="window.location.href='/manageStudentBorrowings.html'">
-                <div class="card-icon">📋</div>
-                <h3>Manage Borrowings</h3>
-                <p>Track student borrowings</p>
             </div>
         `;
     } else {
@@ -114,4 +94,3 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
     localStorage.removeItem('roles');
     window.location.href = '/';
 });
-

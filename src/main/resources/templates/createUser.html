@@ -59,6 +59,24 @@
             background: #0056b3;
         }
 
+        .btn-back {
+            padding: 10px 20px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .btn-back:hover {
+            background: #5a6268;
+        }
+
         .user-table {
             width: 100%;
             border-collapse: collapse;
@@ -255,7 +273,7 @@
         }
 
         .badge-admin {
-            background: #dc3545;
+            background: #3e30de;
             color: white;
         }
 
@@ -274,6 +292,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: background 0.3s;
+            margin-left: 5px;
         }
 
         .btn-delete:hover {
@@ -281,6 +300,26 @@
         }
 
         .btn-delete:active {
+            transform: scale(0.98);
+        }
+
+        .btn-update {
+            padding: 6px 12px;
+            background: #6c75fa;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-update:hover {
+            background: #3092f4;
+        }
+
+        .btn-update:active {
             transform: scale(0.98);
         }
 
@@ -318,7 +357,10 @@
     <div class="container">
         <div class="header">
             <h1>User Management</h1>
-            <button class="btn-create" onclick="openModal()">Create User</button>
+            <div>
+                <a href="/dashboard.html" class="btn-back">← Back to Dashboard</a>
+                <button class="btn-create" onclick="openModal()">Create User</button>
+            </div>
         </div>
 
         <!-- Success Message -->
@@ -353,11 +395,12 @@
                     <td th:text="${user.name}">User Name</td>
                     <td th:text="${user.email}">user@example.com</td>
                     <td>
-                        <span th:if="${user.role == 'ADMIN'}" class="badge badge-admin">ADMIN</span>
+                        <span th:if="${user.role == 'ADMIN'}" class="badge badge-admin">LIBRARIAN</span>
                         <span th:if="${user.role != 'ADMIN'}" class="badge badge-user" th:text="${user.role ?: 'USER'}">USER</span>
                     </td>
                     <td th:text="${user.createdAt != null ? #temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm') : ''}">2024-01-01</td>
                     <td>
+                        <button class="btn-update" th:attr="data-user-id=${user.id},data-user-name=${user.name},data-user-email=${user.email},data-user-role=${user.role}">Update</button>
                         <button class="btn-delete" th:attr="data-user-id=${user.id},data-user-name=${user.name}">Delete</button>
                     </td>
                 </tr>
@@ -377,11 +420,12 @@
     <div id="userModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Create New User</h2>
+                <h2 id="modalTitle">Create New User</h2>
                 <span class="close" onclick="closeModal()">&times;</span>
             </div>
 
             <form id="createUserForm" th:action="@{/createUser}" method="post">
+                <input type="hidden" id="userId" name="id">
                 <div class="form-group">
                     <label for="name">Full Name <span class="required">*</span></label>
                     <input type="text" id="name" name="name" placeholder="Enter full name" required>
@@ -395,9 +439,17 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password <span class="required">*</span></label>
-                    <input type="password" id="password" name="password" placeholder="Enter password" required minlength="6">
+                    <label for="password">Password <span class="required" id="passwordRequired">*</span></label>
+                    <input type="password" id="password" name="password" placeholder="Enter password (leave blank to keep current)" minlength="6">
                     <span class="error-message" id="passwordError">Password must be at least 6 characters</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Role <span class="required">*</span></label>
+                    <select id="role" name="role" required>
+                        <option value="USER">USER</option>
+                        <option value="ADMIN">LIBRARIAN</option>
+                    </select>
                 </div>
 
                 <button type="submit" class="btn-submit" id="submitBtn">Create User</button>

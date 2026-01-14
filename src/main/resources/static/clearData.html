@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚠️ Data Cleanup - Admin Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #dc2626;
+            text-align: center;
+        }
+        .warning {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .warning h3 {
+            color: #92400e;
+            margin-top: 0;
+        }
+        button {
+            width: 100%;
+            background: #dc2626;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        button:hover {
+            background: #b91c1c;
+        }
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        .back-btn {
+            background: #6b7280;
+            margin-bottom: 20px;
+        }
+        .back-btn:hover {
+            background: #4b5563;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-btn" onclick="window.location.href='/dashboard.html'">← Back to Dashboard</button>
+        
+        <h1>⚠️ Clear All Data</h1>
+        
+        <div class="warning">
+            <h3>⚠️ WARNING - PERMANENT ACTION!</h3>
+            <p><strong>This will permanently delete:</strong></p>
+            <ul>
+                <li>All Reservations</li>
+                <li>All Borrow Records</li>
+                <li>All Book Copies</li>
+            </ul>
+            <p><strong style="color: #dc2626;">⚠️ THIS CANNOT BE UNDONE!</strong></p>
+            <p>This is necessary to remove foreign key constraints before deleting books.</p>
+        </div>
+
+        <button id="clearBtn" onclick="clearAllData()">🗑️ CLEAR ALL DATA</button>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api';
+        const token = localStorage.getItem('token');
+
+        async function clearAllData() {
+            if (!confirm('⚠️ ARE YOU ABSOLUTELY SURE?\n\nThis will delete ALL:\n- Reservations\n- Borrow Records\n- Book Copies\n\nThis action CANNOT be undone!\n\nType OK to continue.')) {
+                return;
+            }
+
+            const finalConfirm = prompt('Type DELETE to confirm:');
+            if (finalConfirm !== 'DELETE') {
+                showResult('Action cancelled', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('clearBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Clearing data...';
+
+            try {
+                // Try new endpoint first
+                let response = await fetch(`${API_BASE_URL}/admin/cleanup/clear-all`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                // If 404, try alternative endpoint
+                if (response.status === 404) {
+                    response = await fetch('http://localhost:8080/createProduct/cleanup-all', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+
+                if (response.ok) {
+                    const text = await response.text();
+                    // Try to parse as JSON, fallback to text
+                    try {
+                        const result = JSON.parse(text);
+                        showResult(
+                            `✅ Successfully deleted:\n` +
+                            `• ${result.deleted.reservations} reservations\n` +
+                            `• ${result.deleted.borrowRecords} borrow records\n` +
+                            `• ${result.deleted.bookCopies} book copies\n\n` +
+                            `You can now delete books without errors!`,
+                            'success'
+                        );
+                    } catch {
+                        showResult(`✅ ${text}`, 'success');
+                    }
+                } else {
+                    showResult(`❌ Error: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🗑️ CLEAR ALL DATA';
+            }
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = message;
+            resultDiv.className = `result ${type}`;
+            resultDiv.style.display = 'block';
+            resultDiv.style.whiteSpace = 'pre-line';
+        }
+    </script>
+</body>
+</html>

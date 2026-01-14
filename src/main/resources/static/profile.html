@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Library Management System</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #f3f4f6;
+            color: var(--text-primary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .profile-section {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+        }
+
+        .profile-info h2 {
+            color: var(--text-primary);
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .profile-role {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #e0e7ff;
+            color: var(--primary-color);
+            border-radius: 16px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .info-item {
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .borrowing-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .borrowed-books-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .borrowed-book-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .book-icon {
+            font-size: 2rem;
+        }
+
+        .book-details {
+            flex: 1;
+        }
+
+        .book-title-small {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .book-meta {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .due-date {
+            padding: 8px 16px;
+            background: white;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .due-soon {
+            color: #dc2626;
+            background: #fee2e2;
+        }
+
+        .edit-profile-btn {
+            padding: 12px 24px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .edit-profile-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-secondary {
+            padding: 12px 24px;
+            background: #f3f4f6;
+            color: var(--text-primary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>📚 LMS - My Profile</h1>
+            </div>
+            <div class="nav-user">
+                <span id="userEmail"></span>
+                <button id="logoutBtn" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="profile-container">
+            <button class="back-btn" onclick="window.location.href='/dashboard.html'">
+                ← Back to Dashboard
+            </button>
+
+            <!-- Profile View -->
+            <div id="profileView">
+                <div class="profile-section">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <span id="avatarInitial">👤</span>
+                        </div>
+                        <div class="profile-info">
+                            <h2 id="profileName">Loading...</h2>
+                            <span class="profile-role" id="profileRole">STUDENT</span>
+                        </div>
+                    </div>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Email</div>
+                            <div class="info-value" id="profileEmail">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Phone</div>
+                            <div class="info-value" id="profilePhone">Not provided</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Member Since</div>
+                            <div class="info-value" id="profileJoined">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Account Status</div>
+                            <div class="info-value" id="profileStatus">Active</div>
+                        </div>
+                    </div>
+
+                    <button class="edit-profile-btn" onclick="toggleEditMode()">✏️ Edit Profile</button>
+                </div>
+
+                <!-- Borrowing Statistics -->
+                <div class="profile-section">
+                    <h3 class="section-title">📊 Borrowing Statistics</h3>
+                    <div class="borrowing-stats">
+                        <div class="stat-card">
+                            <div class="stat-number" id="currentBorrowings">0</div>
+                            <div class="stat-label">Current Borrowings</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalBorrowed">0</div>
+                            <div class="stat-label">Total Borrowed</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="overdueBooks">0</div>
+                            <div class="stat-label">Overdue Books</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Borrowings -->
+                
+            </div>
+
+            <!-- Edit Profile Form -->
+            <div id="editView" class="profile-section hidden">
+                <h3 class="section-title">Edit Profile</h3>
+                <form id="editProfileForm">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="editName" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="editEmail" class="form-input" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" id="editPhone" class="form-input" placeholder="Enter phone number">
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="edit-profile-btn">💾 Save Changes</button>
+                        <button type="button" class="btn-secondary" onclick="toggleEditMode()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/profile.js"></script>
+</body>
+</html>

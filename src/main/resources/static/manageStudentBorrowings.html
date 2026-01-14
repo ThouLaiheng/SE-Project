@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Student Borrowings - Library Management System</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <style>
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #cbcbcb;
+            color: var(--text-primary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            background: white;
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #f3f4f6;
+        }
+
+        .borrowings-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .borrowing-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .borrowing-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .book-thumbnail {
+            width: 100px;
+            height: 140px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .borrowing-details {
+            flex: 1;
+        }
+
+        .book-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .student-info {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+
+        .borrowing-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .info-item {
+            padding: 8px 12px;
+            background: #f9fafb;
+            border-radius: 6px;
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-borrowed {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-returned {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-overdue {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-return {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-return:hover {
+            background: #059669;
+        }
+
+        .btn-unreturned {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-unreturned:hover {
+            background: #d97706;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/dashboard.html" class="back-btn">
+            ← Back to Dashboard
+        </a>
+        
+        <h1>📚 Manage Student Borrowings</h1>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="filterBorrows('all')">All Borrowings</button>
+            <button class="tab-btn" onclick="filterBorrows('borrowed')">Currently Borrowed</button>
+            <button class="tab-btn" onclick="filterBorrows('overdue')">Overdue</button>
+            <button class="tab-btn" onclick="filterBorrows('returned')">Returned</button>
+        </div>
+        
+        <div id="loadingMessage" class="loading">Loading borrowings...</div>
+        
+        <div id="borrowingsList" class="borrowings-list" style="display: none;"></div>
+        
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-icon">📚</div>
+            <h3>No Borrowings Found</h3>
+            <p>There are no borrowings matching your filter.</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api';
+        let token = localStorage.getItem('token') || '';
+        let allBorrows = [];
+        let currentFilter = 'all';
+
+        // Check authentication
+        document.addEventListener('DOMContentLoaded', () => {
+            const email = localStorage.getItem('email');
+            const roles = JSON.parse(localStorage.getItem('roles') || '[]');
+            
+            if (!email || !token) {
+                alert('Please log in first');
+                window.location.href = '/';
+                return;
+            }
+            
+            // Check if user is admin or librarian
+            if (!roles.includes('ADMIN') && !roles.includes('LIBRARIAN')) {
+                alert('Access denied. Only admins and librarians can access this page.');
+                window.location.href = '/dashboard.html';
+                return;
+            }
+            
+            loadAllBorrows();
+        });
+
+        async function loadAllBorrows() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/borrows`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    allBorrows = await response.json();
+                    displayBorrows();
+                } else {
+                    document.getElementById('loadingMessage').textContent = 'Failed to load borrowings';
+                }
+            } catch (error) {
+                console.error('Error loading borrows:', error);
+                document.getElementById('loadingMessage').textContent = 'Error loading borrowings';
+            }
+        }
+
+        function displayBorrows() {
+            const listContainer = document.getElementById('borrowingsList');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const emptyState = document.getElementById('emptyState');
+            
+            listContainer.innerHTML = '';
+            
+            let filteredBorrows = allBorrows;
+            
+            // Apply filter
+            if (currentFilter === 'borrowed') {
+                filteredBorrows = allBorrows.filter(b => b.status !== 'RETURNED');
+            } else if (currentFilter === 'overdue') {
+                filteredBorrows = allBorrows.filter(b => {
+                    if (b.status === 'RETURNED') return false;
+                    const dueDate = new Date(b.dueDate);
+                    return dueDate < new Date();
+                });
+            } else if (currentFilter === 'returned') {
+                filteredBorrows = allBorrows.filter(b => b.status === 'RETURNED');
+            }
+            
+            if (filteredBorrows.length === 0) {
+                loadingMessage.style.display = 'none';
+                listContainer.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            loadingMessage.style.display = 'none';
+            listContainer.style.display = 'grid';
+            emptyState.style.display = 'none';
+            
+            filteredBorrows.forEach(borrow => {
+                const card = document.createElement('div');
+                card.className = 'borrowing-card';
+                
+                const dueDate = new Date(borrow.dueDate);
+                const today = new Date();
+                const isOverdue = dueDate < today && borrow.status !== 'RETURNED';
+                
+                // Calculate late fee (0.5$ per day)
+                const daysOverdue = isOverdue ? Math.ceil((today - dueDate) / (1000 * 60 * 60 * 24)) : 0;
+                const lateFee = daysOverdue * 0.5;
+                
+                let statusClass = 'status-borrowed';
+                let statusText = 'Borrowed';
+                
+                if (borrow.status === 'RETURNED') {
+                    statusClass = 'status-returned';
+                    statusText = 'Returned';
+                } else if (isOverdue) {
+                    statusClass = 'status-overdue';
+                    statusText = 'Overdue';
+                }
+                
+                const bookImage = borrow.bookImageUrl 
+                    ? `<img src="${borrow.bookImageUrl}" class="book-thumbnail" alt="${borrow.bookTitle}">` 
+                    : '<div class="book-thumbnail">📚</div>';
+                
+                card.innerHTML = `
+                    ${bookImage}
+                    <div class="borrowing-details">
+                        <div class="book-title">${borrow.bookTitle || 'N/A'}</div>
+                        <div class="student-info">
+                            <strong>${borrow.userName || 'N/A'}</strong> (${borrow.userEmail || 'N/A'})
+                        </div>
+                        
+                        <div class="borrowing-info">
+                            <div class="info-item">
+                                <div class="info-label">Borrow Date</div>
+                                <div class="info-value">${new Date(borrow.borrowDate).toLocaleDateString()}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Due Date</div>
+                                <div class="info-value">${dueDate.toLocaleDateString()}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Status</div>
+                                <div class="info-value">
+                                    <span class="status-badge ${statusClass}">${statusText}</span>
+                                </div>
+                            </div>
+                            ${daysOverdue > 0 ? `
+                                <div class="info-item">
+                                    <div class="info-label">Late Fee</div>
+                                    <div class="info-value" style="color: #dc2626; font-weight: 600;">
+                                        $${lateFee.toFixed(2)} (${daysOverdue} day${daysOverdue > 1 ? 's' : ''} overdue)
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="action-buttons">
+                            ${borrow.status === 'RETURNED' 
+                                ? `<button class="btn btn-unreturned" onclick="markAsUnreturned(${borrow.id})">Mark Unreturned</button>
+                                   <button class="btn btn-delete" onclick="deleteBorrowRecord(${borrow.id})">Delete</button>`
+                                : `<button class="btn btn-return" onclick="markAsReturned(${borrow.id})">Mark Returned</button>`
+                            }
+                        </div>
+                    </div>
+                `;
+                
+                listContainer.appendChild(card);
+            });
+        }
+
+        function filterBorrows(filter) {
+            currentFilter = filter;
+            
+            // Update active button
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            displayBorrows();
+        }
+
+        async function markAsReturned(borrowId) {
+            if (!confirm('Mark this book as returned?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/borrows/${borrowId}/return`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    // Reload the list to reflect the change
+                    await loadAllBorrows();
+                    
+                    // If we're on the "borrowed" or "overdue" tab, the returned book will disappear
+                    // If we're on "all" or "returned" tab, it will update the status
+                    alert('Book marked as returned successfully!');
+                } else {
+                    const error = await response.text();
+                    alert('Failed to mark as returned: ' + error);
+                }
+            } catch (error) {
+                console.error('Error marking as returned:', error);
+                alert('Error marking as returned');
+            }
+        }
+
+        async function markAsUnreturned(borrowId) {
+            if (!confirm('Mark this book as unreturned (borrowed again)?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/borrows/${borrowId}/unreturned`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    // Reload the list to reflect the change
+                    await loadAllBorrows();
+                    alert('Book marked as unreturned successfully!');
+                } else {
+                    const error = await response.text();
+                    alert('Failed to mark as unreturned: ' + error);
+                }
+            } catch (error) {
+                console.error('Error marking as unreturned:', error);
+                alert('Error marking as unreturned');
+            }
+        }
+
+        async function deleteBorrowRecord(borrowId) {
+            if (!confirm('Are you sure you want to delete this borrow record?\n\nThis action cannot be undone!')) {
+                return;
+            }
+            
+            if (!confirm('Final confirmation: This will permanently delete the borrowing history. Continue?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/borrows/${borrowId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok || response.status === 204) {
+                    // Reload the list to reflect the change
+                    await loadAllBorrows();
+                    alert('Borrow record deleted successfully!');
+                } else {
+                    const error = await response.text();
+                    alert('Failed to delete: ' + error);
+                }
+            } catch (error) {
+                console.error('Error deleting borrow record:', error);
+                alert('Error deleting borrow record');
+            }
+        }
+    </script>
+</body>
+</html>

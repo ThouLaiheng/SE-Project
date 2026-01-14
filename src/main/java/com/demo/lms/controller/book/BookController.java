@@ -2,6 +2,7 @@ package com.demo.lms.controller.book;
 
 import com.demo.lms.dto.request.BookRequest;
 import com.demo.lms.dto.response.BookResponse;
+import com.demo.lms.repository.BookCopyRepository;
 import com.demo.lms.service.book.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import java.util.List;
 public class BookController {
 
     private final BookService bookService;
+    private final BookCopyRepository bookCopyRepository;
 
     @PostMapping
     public ResponseEntity<BookResponse> create(@RequestBody BookRequest request) {
@@ -28,7 +30,11 @@ public class BookController {
         return ResponseEntity.ok(
                 bookService.findAll()
                         .stream()
-                        .map(BookResponse::from)
+                        .map(book -> {
+                            int total = bookCopyRepository.findByBookId(book.getId()).size();
+                            int available = bookCopyRepository.findByBookIdAndAvailableTrue(book.getId()).size();
+                            return BookResponse.fromWithCounts(book, total, available);
+                        })
                         .toList()
         );
     }

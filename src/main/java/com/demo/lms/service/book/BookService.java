@@ -4,7 +4,10 @@ import com.demo.lms.dto.request.BookRequest;
 import com.demo.lms.model.entity.Book;
 import com.demo.lms.model.entity.BookCategory;
 import com.demo.lms.repository.BookCategoryRepository;
+import com.demo.lms.repository.BookCopyRepository;
 import com.demo.lms.repository.BookRepository;
+import com.demo.lms.repository.BorrowRecordRepository;
+import com.demo.lms.repository.ReservationRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,9 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final BookCategoryRepository categoryRepository;
+    private final BookCopyRepository bookCopyRepository;
+    private final BorrowRecordRepository borrowRecordRepository;
+    private final ReservationRepository reservationRepository;
 
     public Book create(BookRequest request) {
         Book book = new Book();
@@ -45,6 +51,18 @@ public class BookService {
 
     public void delete(Long id) {
         Book book = findById(id);
+        
+        // Use native queries to force delete in correct order
+        // 1. Delete all reservations for this book
+        reservationRepository.deleteByBookId(id);
+        
+        // 2. Delete all borrow records for book copies of this book
+        borrowRecordRepository.deleteByBookId(id);
+        
+        // 3. Delete all book copies for this book
+        bookCopyRepository.deleteByBookId(id);
+        
+        // 4. Delete the book
         bookRepository.delete(book);
     }
 

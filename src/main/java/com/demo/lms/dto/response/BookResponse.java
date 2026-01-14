@@ -12,7 +12,12 @@ public class BookResponse {
     private String title;
     private String author;
     private String isbn;
-    private String categoryName;
+    // Keep a generic field name for the UI
+    private String category; 
+    private String description;
+    private String imageUrl;
+    private int availableCopies;
+    private int totalCopies;
 
     public static BookResponse from(Book book) {
         return BookResponse.builder()
@@ -20,11 +25,23 @@ public class BookResponse {
                 .title(book.getTitle())
                 .author(book.getAuthor())
                 .isbn(book.getIsbn())
-                .categoryName(
-                        book.getCategory() != null
-                                ? book.getCategory().getName()
-                                : null
-                )
+                .category(book.getCategory() != null ? book.getCategory().getName() : null)
+                .description(book.getDescription())
+                .imageUrl(book.getImageUrl())
+                .build();
+    }
+
+    public static BookResponse fromWithCounts(Book book, int totalCopies, int availableCopies) {
+        return BookResponse.builder()
+                .id(book.getId())
+                .title(book.getTitle())
+                .author(book.getAuthor())
+                .isbn(book.getIsbn())
+                .category(book.getCategory() != null ? book.getCategory().getName() : null)
+                .description(book.getDescription())
+                .imageUrl(book.getImageUrl())
+                .totalCopies(totalCopies)
+                .availableCopies(availableCopies)
                 .build();
     }
 }

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borrow Books - Library Management System</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <style>
+        .search-section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .search-btn {
+            padding: 12px 24px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .filters {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .book-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .book-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .book-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+
+        .book-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .book-author {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .book-category {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #e0e7ff;
+            color: var(--primary-color);
+            border-radius: 16px;
+            font-size: 0.8rem;
+            margin-bottom: 12px;
+        }
+
+        .book-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+
+        .status-available {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-unavailable {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .book-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .borrow-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .borrow-btn:hover:not(:disabled) {
+            background: var(--primary-dark);
+        }
+
+        .borrow-btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #cbcbcb;
+            color: var(--text-primary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(91, 72, 232, 0.1);
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .modal-actions button {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn-cancel {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-cancel:hover {
+            background: #d1d5db;
+        }
+
+        .btn-confirm {
+            background: #5B48E8;
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background: #4736c7;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(91, 72, 232, 0.3);
+        }
+
+        .btn-confirm:active {
+            transform: translateY(0);
+        }
+
+        .book-info-summary {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .book-info-summary h3 {
+            margin: 0 0 8px 0;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .book-info-summary p {
+            margin: 4px 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>📚 LMS - Borrow Books</h1>
+            </div>
+            <div class="nav-user">
+                <span id="userEmail"></span>
+                <button id="logoutBtn" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <button class="back-btn" onclick="window.location.href='/dashboard.html'">
+            ← Back to Dashboard
+        </button>
+
+        <div class="search-section">
+            <div class="search-bar">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search books by title, author, or ISBN...">
+                <button class="search-btn" onclick="searchBooks()">Search</button>
+            </div>
+            <div class="filters">
+                <select id="categoryFilter" class="filter-select" onchange="filterBooks()">
+                    <option value="">All Categories</option>
+                    <option value="FICTION">Fiction</option>
+                    <option value="NON_FICTION">Non-Fiction</option>
+                    <option value="SCIENCE">Science</option>
+                    <option value="TECHNOLOGY">Technology</option>
+                    <option value="HISTORY">History</option>
+                    <option value="BIOGRAPHY">Biography</option>
+                    <option value="EDUCATIONAL">Educational</option>
+                </select>
+                <select id="statusFilter" class="filter-select" onchange="filterBooks()">
+                    <option value="">All Status</option>
+                    <option value="available">Available Only</option>
+                    <option value="newest">Newest Books</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="booksContainer">
+            <div class="loading">Loading books...</div>
+        </div>
+    </div>
+
+    <!-- Borrow Modal -->
+    <div id="borrowModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📖 Borrow Book</h2>
+                <button class="close-btn" onclick="closeBorrowModal()">&times;</button>
+            </div>
+            
+            <div class="book-info-summary" id="modalBookInfo">
+                <!-- Book info will be inserted here -->
+            </div>
+
+            <form id="borrowForm" onsubmit="submitBorrow(event)">
+                <div class="form-group">
+                    <label for="borrowDays">Borrow Duration (Days)</label>
+                    <select id="borrowDays" required>
+                        <option value="1">1 day</option>
+                        <option value="2">2 days</option>
+                        <option value="3" selected>3 days</option>
+                        <option value="4">4 days</option>
+                        <option value="5">5 days</option>
+                    </select>
+                    <small>Standard library policy: Late returns incur fines</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="borrowNotes">Notes (Optional)</label>
+                    <textarea id="borrowNotes" rows="3" placeholder="Any special requests or notes..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeBorrowModal()">Cancel</button>
+                    <button type="submit" class="btn-confirm">Confirm Borrow</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/borrowBooks.js"></script>
+</body>
+</html>
